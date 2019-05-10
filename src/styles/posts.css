@@ -1,0 +1,99 @@
+/**
+ * Styles for application posts.
+ *
+ * @see https://google.github.io/styleguide/htmlcssguide.html
+ * @see https://github.com/google/closure-stylesheets
+ */
+
+.post .source {
+  background-repeat: no-repeat;
+  margin-bottom: 10px;
+  padding-left: 27px;
+  text-transform: capitalize;
+}
+
+.post .footer {
+  width: 100%;
+}
+
+.post .footer,
+.post .footer tr,
+.post .footer th,
+.post .footer td {
+  font-weight: normal;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.post .footer th {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.post .footer td {
+  text-align: right;
+  width: 80%;
+}
+
+.post .footer img,
+.post .footer iframe {
+  border-radius: 50%;
+  margin-right: 5px;
+  height: 20px;
+  vertical-align: middle;
+  width: 20px;
+}
+
+.post .source span,
+.post .footer a {
+  font-size: 80%;
+}
+
+.post .text {
+  cursor: pointer;
+  margin: 0;
+  /*white-space: pre-wrap;*/
+  /*text-align: justify;*/
+  word-wrap: break-word;
+}
+
+.post .media .frame {
+  /*border-top-left-radius: 5px;
+  border-top-right-radius: 5px;*/
+  border-radius: 5px;
+  display: flex;
+  margin-top: 10px;
+  max-height: 300px;
+  min-height: 100px;
+  overflow: hidden;
+  position: relative;
+}
+
+.post .media .frame .cover {
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+.post .media iframe,
+.post .media video {
+  align-self: center;
+  height: auto;
+  min-height: 300px;
+  width: 100%;
+}
+
+.post .media .image {
+  min-height: 250px;
+}
+
+.post .media video.controls {
+  background: #f1f3f4;
+  border-radius: 0;
+  height: 30px;
+  min-height: 30px;
+}

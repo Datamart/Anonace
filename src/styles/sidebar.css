@@ -1,0 +1,71 @@
+/**
+ * Styles for sidebar.
+ *
+ * @see https://google.github.io/styleguide/htmlcssguide.html
+ * @see https://github.com/google/closure-stylesheets
+ *
+ * @see https://material.io/design/components/navigation-drawer.html
+ * @see https://material.io/design/environment/light-shadows.html
+ */
+
+#sidebar {
+  float: left;
+  min-height: 85%;
+  width: 35%;
+}
+
+#sidebar.open {
+  display: block;
+}
+
+#sidebar .links {
+  font-size: 80%;
+  text-align: center;
+}
+
+#sidebar .twitter,
+#sidebar .reddit,
+#sidebar .google {
+  text-transform: capitalize;
+}
+
+#sidebar .google {
+  /* Google+ API is deprecated */
+  display: none;
+}
+
+#sidebar .google label:after {
+  content: '+';
+}
+
+#sidebar #settings-list td,
+#sidebar #source-list td,
+#sidebar #interest-list td {
+  padding: 0 0 18px;
+}
+
+#sidebar #settings-list select {
+  /*width: 50%;*/
+  outline: none;
+}
+
+#sidebar label span {
+  vertical-align: middle;
+}
+
+@media screen and (max-width: 1024px) {
+  #sidebar {
+    display: none;
+    float: none;
+    min-height: auto;
+    width: 100%;
+  }
+
+  #sidebar label input {
+    vertical-align: middle;
+  }
+
+  #sidebar .links {
+    display: none;
+  }
+}

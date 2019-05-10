@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://anonace.com/sitemap.xml
+Host: https://anonace.com

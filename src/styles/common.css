@@ -1,0 +1,121 @@
+/**
+ * Default application styles.
+ *
+ * @see https://google.github.io/styleguide/htmlcssguide.html
+ * @see https://github.com/google/closure-stylesheets
+ */
+
+html, body, td, th, input, button, select, h3 {
+  font-family: arial, sans-serif;
+  font-size: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  min-height: 100%;
+  width: 100%;
+}
+
+body {
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+}
+
+.container {
+  height: 100%;
+  margin: 0 auto;
+  width: 70%;
+}
+
+.header b,
+.box h3 {
+  display: inline-block;
+  transform: scale(1, 1.15);
+}
+
+#content {
+  padding-left: 37%;
+  min-height: 85%;
+}
+
+.box {
+  border-radius: 5px;
+  margin-bottom: 15px;
+  padding: 15px;
+}
+
+.box table {
+  margin: 15px 0 0;
+}
+
+.box table {
+  width: 100%;
+}
+
+.box h3 img {
+  border-radius: 50%;
+  margin-right: 10px;
+  transform: scale(1, .85);
+  vertical-align: middle;
+  width: 24px;
+}
+
+.interests form table,
+.interests input[type="text"],
+.interests button {
+  border-radius: 5px;
+}
+
+.interests button {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  padding: 9px;
+}
+
+.interests form table td:first-child {
+  padding: 0 3px 0 7px;
+}
+
+.interests input[type="text"] {
+  padding: 9px 0;
+  width: 100%;
+}
+
+.interests input[type="text"],
+.interests button {
+  border: 0;
+  outline: none;
+}
+
+.interests a {
+  font-size: 140%;
+  line-height: 100%;
+}
+
+.no-js #sidebar,
+.no-js #content,
+#pwa-install {
+  display: none;
+}
+
+@media screen and (max-width: 1024px) {
+  .container {
+    width: 95%;
+  }
+
+  #content {
+    padding-left: 0;
+    min-height: auto;
+  }
+
+  #pwa-install.visible {
+    cursor: pointer;
+    display: block;
+  }
+}

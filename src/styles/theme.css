@@ -1,0 +1,122 @@
+/**
+ * Default application CSS theme.
+ *
+ * @see https://google.github.io/styleguide/htmlcssguide.html
+ * @see https://github.com/google/closure-stylesheets
+ */
+
+body,
+button {
+  background: #eee;
+  color: #222;
+}
+
+.post .source,
+.post .footer a,
+.header b,
+.links a,
+.box h3 {
+  color: #666;
+}
+
+.box {
+  background: #fff;
+}
+
+.box,
+.interests form table {
+  border: solid 1px #ddd;
+}
+
+.interests a {
+  color: #b00;
+}
+
+.text a,
+#pwa-install span {
+  color: #07d;
+}
+
+.header svg {
+  fill: #666;
+}
+
+.header a {
+  border: solid 1px #eee;
+}
+
+.header a:hover,
+/*.header a:focus,*/
+.header a:active {
+  background-color: #ddd;
+  border: solid 1px #dedede;
+}
+
+.header a:hover svg,
+/*.header a:focus svg,*/
+.header a:active svg {
+  fill: #222;
+}
+
+#sidebar select {
+  background: transparent;
+  border: 0;
+  /*border: solid 1px #ddd;*/
+}
+
+#sidebar select[disabled] {
+  color: #999;
+}
+
+body.dark,
+.dark button {
+  background: #212121;
+  color: #fff;
+}
+
+.dark .box,
+.dark .interests input[type="text"] {
+  background: #303030;
+  border: 0;
+}
+
+.dark .interests form table {
+  border-color: #666;
+}
+
+.dark .header a {
+  border: solid 1px #212121;
+}
+
+.dark .header svg {
+  fill: #eee;
+}
+
+.dark .post .source,
+.dark .post .footer a,
+.dark .header b,
+.dark .links a,
+.dark .box h3,
+.dark select,
+.dark input {
+  color: #eee;
+}
+
+.dark .header a:hover,
+/*.dark .header a:focus,*/
+.dark .header a:active {
+  background-color: #666;
+  border: solid 1px #777;
+}
+
+.dark .header a:hover svg,
+/*.dark .header a:focus svg,*/
+.dark .header a:active svg {
+  fill: #efefef;
+}
+
+.dark .text a,
+.dark #pwa-install span {
+  color: #efefef;
+  text-decoration: underline;
+}

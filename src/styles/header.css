@@ -1,0 +1,59 @@
+/**
+ * Styles for application header.
+ *
+ * @see https://google.github.io/styleguide/htmlcssguide.html
+ * @see https://github.com/google/closure-stylesheets
+ */
+
+.header {
+  clear: both;
+  height: 10%;
+  min-height: 32px;
+}
+
+.header table {
+  height: 100%;
+  width: 100%;
+}
+
+.header svg {
+  height: 20%;
+  margin-left: 3px;
+  vertical-align: middle;
+}
+
+.header a {
+  display: none;
+  /*display: inline-block;*/
+  border-radius: 50%;
+  margin-left: 5px;
+  outline: none;
+  padding: 7px;
+  transition: background .3s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.header a svg {
+  margin: 0;
+}
+
+.header .md-gear,
+.header .ios-gear {
+  display: none;
+}
+
+@media screen and (max-width: 1024px) {
+  .ios .header .md-gear,
+  .md .header .ios-gear {
+    display: none;
+  }
+
+  .md .header .md-gear,
+  .ios .header .ios-gear {
+    display: inline;
+  }
+
+  .header a {
+    display: inline-block;
+  }
+}
