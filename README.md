@@ -8,4 +8,4 @@ Anonace - Follow and read favorite authors, topics, and hashtags.<br>
 Read your favorite authors, influencers and brands, follow your interests by topics and hashtags.<br>
 Free. Anonymously. Securely. No sign-up. No ads.<br>
 <br>
-For more information please visit [Anonace website](https://anonace.com).
+Try it out at [anonace.com](https://anonace.com).
