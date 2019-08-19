@@ -18,15 +18,10 @@
 reader.Api = function() {
   /** @type {boolean} */ this.cacheEnabled = true;
 
-  /** @const {string} */ var API_HOST = 'api.anonace.com';
-  /** @const {string} */ var API_PROTO = 'https';
-  /** @const {string} */ var API_PATH = '/v1/';
-
-  // /** @const {string} */ var API_HOST = 'localhost';
-  // /** @const {string} */ var API_PROTO = 'http';
-  // /** @const {string} */ var API_PATH = '/anonace/v1/';
-
-  /** @const {string} */ var API_BASE = API_PROTO + '://' + API_HOST + API_PATH;
+  /** @const {string} */
+  var API_KEY = 'AKfycbzS-XNTuXRVPNOirOzmPTxh22qr8iap2bDRkIHi_LdpWXQC44I';
+  /** @const {string} */
+  var API_URL = 'https://script.google.com/macros/s/' + API_KEY + '/exec';
 
   /**
    * @param {string} query The search query as string.
@@ -34,9 +29,10 @@ reader.Api = function() {
    * @param {!Function} callback The callback function.
    */
   this.typeahead = function(query, count, callback) {
-    /** @type {string} */ var url = API_BASE + 'typeahead?q=' +
+    /** @type {string} */ var url = API_URL + '?action=typeahead' +
+                                    '&source=twitter&query=' +
                                     util.StringUtils.URI.encode(query) +
-                                    '&c=' + count;
+                                    '&count=' + count;
     load_(url, callback);
   };
 
@@ -54,9 +50,10 @@ reader.Api = function() {
     for (source in sources) {
       (function(source) {
         if (sources[source]) {
-          /** @type {string} */ var url = API_BASE + 'search?q=' +
+          /** @type {string} */ var url = API_URL + '?action=search' +
+                                          '&source=' + source + '&query=' +
                                           sources[source].encodeQuery(query) +
-                                          '&c=' + count + '&s=' + source;
+                                          '&count=' + count;
           load_(url, function(data) {
             result[source] = data;
             data && data['error'] && console.log('[ERROR]', source, data);
@@ -72,7 +69,7 @@ reader.Api = function() {
    * @param {!Function} callback The callback function.
    */
   this.proxy = function(url, callback) {
-    url = API_BASE + 'proxy?url=' + util.StringUtils.URI.encode(url);
+    url = API_URL + '?action=proxy&query=' + util.StringUtils.URI.encode(url);
     load_(url, callback);
   };
 
