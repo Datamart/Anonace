@@ -361,6 +361,7 @@ reader.App = function() {
     if (!('dark-mode' in data) && dom.context.matchMedia) {
       var query = '(prefers-color-scheme: dark)';
       data['dark-mode'] = +dom.context.matchMedia(query).matches;
+      config_.set(data);
     }
 
     if (+data['dark-mode']) {
