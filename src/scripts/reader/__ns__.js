@@ -358,6 +358,11 @@ reader.App = function() {
   function initDarkMode_() {
     /** @type {!Object.<string, number>} */ var data = config_.get();
 
+    if (!('dark-mode' in data) && dom.context.matchMedia) {
+      var query = '(prefers-color-scheme: dark)';
+      data['dark-mode'] = +dom.context.matchMedia(query).matches;
+    }
+
     if (+data['dark-mode']) {
       dom.css.addClass(dom.document.body, 'dark');
     } else {
