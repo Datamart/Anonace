@@ -15,31 +15,38 @@ readonly JS_COMPILER="${LIB}/compiler.jar"
 readonly SRC_PATH="${CWD}/../src"
 readonly APP_PATH="${CWD}/../www"
 
-readonly APP_TEMPLATE="${SRC_PATH}/index.html"
 readonly SERVICE_WORKER="${SRC_PATH}/sw.js"
 
 readonly JS_COMPILED="${APP_PATH}/bundle.js"
 readonly CSS_COMPILED="${APP_PATH}/bundle.css"
-readonly APP_COMPILED="${APP_PATH}/index.html"
 readonly JS_WORKER="${APP_PATH}/sw.js"
 
 readonly BUILD_DATE=$(date +%Y-%m-%d)
+readonly APP_VERSION="1.0.3"
+
+readonly TEMPLATES=('index.html' 'technical-information/index.html')
 
 function create_application_bundle() {
   BUNDLE_JS=$(<"${JS_COMPILED}")
   BUNDLE_CSS=$(<"${CSS_COMPILED}")
-  TEMPLATE=$(<"${APP_TEMPLATE}")
 
-  $PYTHON -c "import sys;print(sys.argv[1].replace('/* @BUNDLE_JS */', sys.argv[2]).replace('/* @BUNDLE_CSS */', sys.argv[3]))" \
-      "${TEMPLATE}" "${BUNDLE_JS}" "${BUNDLE_CSS}" > "${APP_COMPILED}"
+  for filepath in "${TEMPLATES[@]}"; do
+    TEMPLATE=$(<"${SRC_PATH}/${filepath}")
+    COMPILED="${APP_PATH}/${filepath}"
 
-  cat "${APP_COMPILED}" | tr -s '\r\n[:blank:]' ' ' > "${APP_COMPILED}.back"
-  mv "${APP_COMPILED}.back" "${APP_COMPILED}"
-  sed -i .back s/"@BUILD_DATE"/"${BUILD_DATE}"/g "${APP_COMPILED}"
+    $PYTHON -c "import sys;print(sys.argv[1].replace('/* @BUNDLE_JS */', sys.argv[2]).replace('/* @BUNDLE_CSS */', sys.argv[3]))" \
+        "${TEMPLATE}" "${BUNDLE_JS}" "${BUNDLE_CSS}" > "${COMPILED}"
+
+    cat "${COMPILED}" | tr -s '\r\n[:blank:]' ' ' > "${COMPILED}.back"
+    mv "${COMPILED}.back" "${COMPILED}"
+    sed -i .back s/"@BUILD_DATE"/"${BUILD_DATE}"/g "${COMPILED}"
+    sed -i .back s/"@APP_VERSION"/"${APP_VERSION}"/g "${COMPILED}"
+
+    [ -e "${COMPILED}.back" ] && rm "${COMPILED}.back"
+  done
 
   [ -e "${JS_COMPILED}" ] && rm "${JS_COMPILED}"
   [ -e "${CSS_COMPILED}" ] && rm "${CSS_COMPILED}"
-  [ -e "${APP_COMPILED}.back" ] && rm "${APP_COMPILED}.back"
 }
 
 function create_service_worker() {

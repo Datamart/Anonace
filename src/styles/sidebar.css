@@ -18,10 +18,10 @@
   display: block;
 }
 
-#sidebar .links {
+/*#sidebar .links {
   font-size: 80%;
   text-align: center;
-}
+}*/
 
 #sidebar .twitter,
 #sidebar .reddit,
@@ -40,7 +40,8 @@
 
 #sidebar #settings-list td,
 #sidebar #source-list td,
-#sidebar #interest-list td {
+#sidebar #interest-list td ,
+#sidebar .links td {
   padding: 0 0 18px;
 }
 
@@ -65,7 +66,7 @@
     vertical-align: middle;
   }
 
-  #sidebar .links {
+/*  #sidebar .links {
     display: none;
-  }
+  }*/
 }
