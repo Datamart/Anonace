@@ -1,5 +1,5 @@
 [{
   "relation": ["delegate_permission/common.handle_all_urls"],
   "target" : { "namespace": "android_app", "package_name": "com.anonace.android",
-               "sha256_cert_fingerprints": ["00:CA:E5:C2:F4:57:F2:2F:76:B7:30:7D:FE:5E:95:F6:E4:18:FC:24:7E:98:B8:08:2B:87:94:B3:97:1C:9A:13"] }
+               "sha256_cert_fingerprints": ["SHA256: 7E:98:A4:C7:3B:C3:BD:7C:24:12:44:03:70:F9:9E:E4:43:90:6A:1F:F0:1C:C1:E0:D4:F3:DE:8B:0C:58:19:24"] }
 }]
