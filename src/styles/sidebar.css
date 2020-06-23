@@ -19,18 +19,8 @@
 }
 
 #sidebar .twitter,
-#sidebar .reddit,
-#sidebar .google {
+#sidebar .reddit {
   text-transform: capitalize;
-}
-
-#sidebar .google {
-  /* Google+ API is deprecated */
-  display: none;
-}
-
-#sidebar .google label:after {
-  content: '+';
 }
 
 #sidebar #settings-list td,
