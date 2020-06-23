@@ -5,7 +5,7 @@ Follow these instructions to setup and run this project on your local computer.
 The following command will create the `bundle.js` and `bundle.css` files:
 
 ```bash
-cd bin && ./bundle
+npm run bundle
 ```
 
 ### Run the uncompressed version

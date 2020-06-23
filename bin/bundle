@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Builds the application bundle.
+# Builds the scripts and styles bundles.
 # See: https://google.github.io/styleguide/shell.xml
 # See: https://github.com/google/closure-stylesheets
 # See: https://developers.google.com/closure/compiler/
