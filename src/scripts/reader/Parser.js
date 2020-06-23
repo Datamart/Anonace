@@ -16,27 +16,25 @@
 reader.Parser = function() {
 
   /**
-   * @param {!Array.<!Object>} data List of data items.
+   * @param {!Array<!Object>} data List of data items.
    * @param {!reader.MediaExtractor} extractor The media extractor.
-   * @return {!Object.<string, *>}
+   * @return {!Object<string, *>}
    */
-  this.parse = function(data, extractor) {return {};};
+  this.parse = (data, extractor) => {};
 
   /**
    * Encodes query string. Can be overwritten in sub-classes.
    * @param {string} query The query string to encode.
    * @return {string} Returns encoded query string.
    */
-  this.encodeQuery = function(query) {
-    return encodeURIComponent(query);
-  };
+  this.encodeQuery = (query) => encodeURIComponent(query);
 
   /**
    * @param {string} key The template key.
    * @param {!Object} values The template values as dict.
    * @return {string} Returns parsed template text content.
    */
-  this.parseTemplate = function(key, values) {
+  this.parseTemplate = (key, values) => {
     if (!templates_[key]) {
       templates_[key] = dom.getElementById(key + '-template').textContent;
     }
@@ -47,7 +45,7 @@ reader.Parser = function() {
    * @param {!Object} values The template values.
    * @return {string} Returns parsed template text content.
    */
-  this.parseItemTemplate = function(values) {
+  this.parseItemTemplate = (values) => {
     return self_.parseTemplate('content-item', values);
   };
 
@@ -56,47 +54,47 @@ reader.Parser = function() {
    * @return {string} Returns parsed template text content.
    * @deprecated Use 'parseTemplate' instead.
    */
-  this.parseInterestTemplate = function(values) {
+  this.parseInterestTemplate = (values) => {
     return self_.parseTemplate('interest-item', values);
   };
 
-  this.getKey = function(date) {
+  this.getKey = (date) => {
     return date.toISOString().replace(/\D+/g, '');
   };
 
-  this.getImageHtml = function(image, link) {
-    /** @type {!Object.<string, number>} */ var data = config_.get();
-    /** @type {string} */ var theme = +data['dark-mode'] ? '424242' : 'eee';
+  this.getImageHtml = (image, link) => {
+    const /** !Object<string, number> */ data = config_.get();
+    const /** string */ theme = +data['dark-mode'] ? '424242' : 'eee';
     return self_.parseTemplate(
         'image-frame', {'image': image, 'link': link, 'theme': theme});
   };
 
-  this.getYoutubeHtml = function(url) {
+  this.getYoutubeHtml = (url) => {
     return self_.parseTemplate('iframe-frame', {'url': url});
   };
 
-  this.formatDate = function(date) {
+  this.formatDate = (date) => {
     return formatters.DateFormatter.formatDate(date, 'dd MMM, YYYY  hh:mm');
   };
 
-  this.formatHashTags = function(text, base) {
+  this.formatHashTags = (text, base) => {
     return formatLinks_(text, base, /#([^\s\?\)#@:!…]+)/img);
   };
 
-  this.formatUserNames = function(text, base) {
+  this.formatUserNames = (text, base) => {
     return formatLinks_(text, base, /@([^\s\?\)#@:!…]+)/img);
   };
 
-  this.formatLinks = function(text, pattern) {
+  this.formatLinks = (text, pattern) => {
     return formatLinks_(text, '', pattern);
   };
 
-  function formatLinks_(text, base, pattern) {
-    /** @type {!Array.<string>} */ var matches = text.match(pattern) || [];
-    /** @type {number} */ var length = matches.length;
-    /** @type {string} */ var chars = '([\\[\\]\\s\\-\\:\\?\\.,;!])';
-    /** @type {string} */ var link;
-    /** @type {string} */ var match;
+  const formatLinks_ = (text, base, pattern) => {
+    const /** !Array<string> */ matches = text.match(pattern) || [];
+    const /** string */ chars = '([\\[\\]\\s\\-\\:\\?\\.,;!])';
+    let /** number */ length = matches.length;
+    let /** string */ link;
+    let /** string */ match;
 
     for (; length--;) {
       match = matches[length];
@@ -121,32 +119,28 @@ reader.Parser = function() {
     }
 
     return text;
-  }
+  };
 
   /**
    * The reference to current class instance.
    * Used in private methods and for preventing jslint errors.
-   * @type {!reader.Parser}
-   * @private
+   * @private {!reader.Parser}
    */
-  var self_ = this;
+  const self_ = this;
 
   /**
-   * @type {!dom.Template}
-   * @private
+   * @private {!dom.Template}
    */
-  var template_ = new dom.Template;
+  const template_ = new dom.Template;
 
   /**
-   * @type {!reader.DataStorage}
-   * @private
+   * @private {!reader.DataStorage}
    */
-  var config_ = new reader.DataStorage('config');
+  const config_ = new reader.DataStorage('config');
 
   /**
    * Key-value storage for loaded templates.
-   * @type {!Object.<string, string>}
-   * @private
+   * @private {!Object<string, string>}
    */
-  var templates_ = {};
+  const templates_ = {};
 };

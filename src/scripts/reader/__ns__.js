@@ -71,19 +71,6 @@ reader.App = function() {
         link && dom.context.open(link, '_blank');
       }
     };
-
-    // Google+ API is deprecated
-    //
-    // Google+ link fix:
-    // var links = util.Array.toArray(
-    //     dom.getElementsByClassName(node, 'ot-hashtag')).concat(
-    //     util.Array.toArray(dom.getElementsByClassName(node, 'ot-anchor')));
-    // var length = links.length;
-
-    // for (; length--;) {
-    //   links[length].setAttribute('target', '_blank');
-    //   links[length].setAttribute('rel', 'external noopener');
-    // }
   }
 
   function initForm_() {

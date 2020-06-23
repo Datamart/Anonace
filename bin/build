@@ -275,7 +275,7 @@ function main() {
   download
   compile_css
   compile_js
-  compile_html
+  # compile_html
   # copy_assets
   build_app
   create_service_worker

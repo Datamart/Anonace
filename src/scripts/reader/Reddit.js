@@ -16,20 +16,20 @@ reader.Reddit = function() {
   reader.Parser.call(this);
 
   /**
-   * @param {!Array.<!Object>} data List of posts.
+   * @param {!Array<!Object>} data List of posts.
    * @param {!reader.MediaExtractor} extractor The media extractor.
-   * @return {!Object.<string, !Array>}
+   * @return {!Object<string, !Array>}
    * @override
    */
-  this.parse = function(data, extractor) {
-    /** @type {!Object.<string, *>} */ var result = {};
-    /** @type {number} */ var length = data.length;
+  this.parse = (data, extractor) => {
+    const /** !Object<string, *> */ result = {};
+    let /** number */ length = data.length;
 
     for (; length--;) {
-      /** @type {!Object} */ var item = data[length]['data'];
+      const /** !Object */ item = data[length]['data'];
       if (item) {
-        var date = new Date(item['created'] * 1E3);
-        var key = self_.getKey(date);
+        const /** !Date */ date = new Date(item['created'] * 1E3);
+        const /** string */ key = self_.getKey(date);
 
         result[key] = result[key] || [];
         result[key].push(self_.parseItemTemplate({
@@ -50,13 +50,13 @@ reader.Reddit = function() {
     return result;
   };
 
-  function findMedia_(item, extractor) {
-    var html = getEmbededHtml_(item);
-    var mp4 = 'fallback_url';
-    var hls = 'hls_url';
-    var preview;
-    var image;
-    var media;
+  const findMedia_ = (item, extractor) => {
+    let html = getEmbededHtml_(item);
+    let mp4 = 'fallback_url';
+    let hls = 'hls_url';
+    let preview;
+    let image;
+    let media;
 
     function fix(url) {
       return url.replace('?source=fallback', '');
@@ -95,10 +95,10 @@ reader.Reddit = function() {
     }
 
     return html;
-  }
+  };
 
-  function getEmbededHtml_(item) {
-    var html = item['media_embed'] && item['media_embed']['content'];
+  const getEmbededHtml_ = (item) => {
+    let html = item['media_embed'] && item['media_embed']['content'];
 
     if (html) {
       html = html.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
@@ -108,9 +108,9 @@ reader.Reddit = function() {
       // html = html.replace('<iframe ', '<iframe sandbox ');
 
       if (~html.indexOf('i.imgur.com')) {
-        var str = decodeURIComponent(html);
-        var matches = str.match(/image=([^\?]*)/);
-        var url = matches && matches[1];
+        let str = decodeURIComponent(html);
+        let matches = str.match(/image=([^\?]*)/);
+        let url = matches && matches[1];
         if (url && !url.indexOf('http')) {
           html = self_.getImageHtml(
               url, 'https://www.reddit.com' + item['permalink']);
@@ -119,18 +119,17 @@ reader.Reddit = function() {
     }
 
     return html;
-  }
+  };
 
-  function getVideoHtml_(mp4, hls, img) {
+  const getVideoHtml_ = (mp4, hls, img) => {
     return self_.parseTemplate(
         'reddit-video', {'mp4_url': mp4, 'hls_url': hls, 'img_url': img});
-  }
+  };
 
   /**
    * The reference to current class instance.
    * Used in private methods and for preventing jslint errors.
-   * @type {!reader.Reddit}
-   * @private
+   * @private {!reader.Reddit}
    */
   var self_ = this;
 };

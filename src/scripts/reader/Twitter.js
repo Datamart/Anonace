@@ -15,10 +15,10 @@
 reader.Twitter = function() {
   reader.Parser.call(this);
 
-  /** @const {string} */ const BASE_URL = 'https://twitter.com/';
-  /** @const {string} */ const STATUS_URL = 'https://twitter.com/web/status/';
-  /** @const {string} */ const HASHTAG_URI = 'https://twitter.com/hashtag/';
-  /** @const {!RegExp} */ const LINK_PATTERN = /https?:\/\/t\.co\/\w+/img;
+  const /** string */ BASE_URL = 'https://twitter.com/';
+  const /** string */ STATUS_URL = 'https://twitter.com/web/status/';
+  const /** string */ HASHTAG_URI = 'https://twitter.com/hashtag/';
+  const /** !RegExp */ LINK_PATTERN = /https?:\/\/t\.co\/\w+/img;
 
   /**
    * Encodes query string.
@@ -26,28 +26,27 @@ reader.Twitter = function() {
    * @return {string} Returns encoded query string.
    * @override
    */
-  this.encodeQuery = function(query) {
+  this.encodeQuery = (query) => {
     return encodeURIComponent(query.split(',').join(' OR '));
   };
 
   /**
-   * @param {!Array.<!Object>} data List of twits.
+   * @param {!Array<!Object>} data List of twits.
    * @param {!reader.MediaExtractor} extractor The media extractor.
-   * @return {!Object.<string, *>}
+   * @return {!Object<string, *>}
    * @override
    */
-  this.parse = function(data, extractor) {
-    /** @type {!Object<string, !Array>} */ const result = {};
-    /** @type {number} */ let length = data.length;
+  this.parse = (data, extractor) => {
+    const /** !Object<string, !Array> */ result = {};
+    let /** number */ length = data.length;
 
     for (; length--;) {
-      /** @type {!Object} */ const item = data[length];
+      const /** !Object */ item = data[length];
       if (item && item['id_str']) {
-        /** @type {string} */ let text = item['full_text'] ||
-                                         item['text'] || '';
-        /** @type {!Object} */ let user = item['user'] || {};
-        /** @type {!Date} */ let date = new Date(item['created_at']);
-        /** @type {string} */ let key = self_.getKey(date);
+        let /** string */ text = item['full_text'] || item['text'] || '';
+        const /** !Object */ user = item['user'] || {};
+        const /** !Date */ date = new Date(item['created_at']);
+        const /** string */ key = self_.getKey(date);
 
         if (item['retweeted_status'] && text.indexOf('RT @') == 0) {
           text = text.split(': ')[0] + ': ' +
@@ -78,7 +77,7 @@ reader.Twitter = function() {
     return result;
   };
 
-  function findMedia_(item, extractor) {
+  const findMedia_ = (item, extractor) => {
     let media = ((item['extended_entities'] || {})['media'] || [])[0];
     const url = media && media['media_url_https'];
     const status = STATUS_URL + item['id_str'];
@@ -87,7 +86,7 @@ reader.Twitter = function() {
       item['media'] = self_.getImageHtml(url, status);
     } else {
       media = ((item['entities'] || {})['urls'] || [])[0];
-      extractor.extract(media && media['expanded_url'], function(media) {
+      extractor.extract(media && media['expanded_url'], (media) => {
         let html = '';
         if ('image' == media['type']) {
           html = self_.getImageHtml(media['url'], status);
@@ -105,13 +104,12 @@ reader.Twitter = function() {
     }
 
     return url;
-  }
+  };
 
   /**
    * The reference to current class instance.
    * Used in private methods and for preventing jslint errors.
-   * @type {!reader.Twitter}
-   * @private
+   * @private {!reader.Twitter}
    */
   const self_ = this;
 };

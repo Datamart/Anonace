@@ -15,7 +15,6 @@
  * @constructor
  */
 reader.Api = function() {
-  /** @type {boolean} */ this.cacheEnabled = true;
 
   const /** string */ API_KEY = atob(
         'QUtmeWNielMtWE5UdVhSVlBOT2lyT3ptUFR4aD' +
@@ -24,12 +23,14 @@ reader.Api = function() {
   const /** string */ API_URL = 'https://script.google.com/macros/s/' +
                                 API_KEY + '/exec';
 
+  /** @type {boolean} */ this.cacheEnabled = true;
+
   /**
    * @param {string} query The search query as string.
    * @param {number} count The max results count as integer.
    * @param {!Function} callback The callback function.
    */
-  this.typeahead = function(query, count, callback) {
+  this.typeahead = (query, count, callback) => {
     const /** string */ url = API_URL + '?action=typeahead' +
                               '&source=twitter&query=' +
                               encodeURIComponent(query) +
@@ -43,7 +44,7 @@ reader.Api = function() {
    * @param {number} count The max results count as integer.
    * @param {!Function} callback The callback function.
    */
-  this.search = function(sources, query, count, callback) {
+  this.search = (sources, query, count, callback) => {
     let /** number */ length = util.Object.keys(sources).length;
     const /** !Object<string, *> */ result = {};
 
@@ -70,7 +71,7 @@ reader.Api = function() {
    * @param {string} url The URL to load.
    * @param {!Function} callback The callback function.
    */
-  this.proxy = function(url, callback) {
+  this.proxy = (url, callback) => {
     url = API_URL + '?action=proxy&query=' + encodeURIComponent(url);
     load_(url, callback);
   };
@@ -97,14 +98,12 @@ reader.Api = function() {
   /**
    * The reference to current class instance.
    * Used in private methods and for preventing jslint errors.
-   * @type {!reader.Api}
-   * @private
+   * @private {!reader.Api}
    */
   const self_ = this;
 
   /**
-   * @type {!Object<string, ?Object>}
-   * @private
+   * @private {!Object<string, ?Object>}
    */
   const cache_ = {};
 };

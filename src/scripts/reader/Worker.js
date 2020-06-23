@@ -12,8 +12,8 @@
  * @see chrome://serviceworker-internals/
  */
 reader.Worker = function() {
-  /** @const {string} */ const SERVICE_WORKER = '/sw.js';
-  /** @const {string} */ const INSTALL_BUTTON = 'pwa-install';
+  const /** string */ SERVICE_WORKER = '/sw.js';
+  const /** string */ INSTALL_BUTTON = 'pwa-install';
 
   /**
    * Initializes service worker.
@@ -72,10 +72,9 @@ reader.Worker = function() {
   };
 
   /**
-   * @type {?Event}
-   * @private
+   * @private ?Event
    */
-  var installPromptEvent_;
+  let installPromptEvent_;
 
   // Initializing service worker.
   init_();
