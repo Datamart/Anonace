@@ -43,7 +43,7 @@ reader.Worker = function() {
   }
 
   /**
-   * @param {Element} button The install button container.
+   * @param {?Element} button The install button container.
    * @private
    */
   function initInstallButton_(button) {
@@ -72,7 +72,7 @@ reader.Worker = function() {
   }
 
   /**
-   * @type {Event}
+   * @type {?Event}
    * @private
    */
   var installPromptEvent_;

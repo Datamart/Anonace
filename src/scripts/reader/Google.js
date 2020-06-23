@@ -23,13 +23,13 @@ reader.Google = function() {
   reader.Parser.call(this);
 
   /**
-   * @param {Array.<!Object>} data List of twits.
+   * @param {!Array.<!Object>} data List of posts.
    * @param {!reader.MediaExtractor} extractor The media extractor.
    * @return {!Object.<string, *>}
    * @override
    */
   this.parse = function(data, extractor) {
-    /** @type {!Object.<string, Array>} */ var result = {};
+    /** @type {!Object.<string, !Array>} */ var result = {};
     /** @type {number} */ var length = data.length;
 
     for (; length--;) {
@@ -38,8 +38,8 @@ reader.Google = function() {
         /** @type {!Object} */ var user = item['actor'] || {};
         /** @type {!Date} */ var date = new Date(item['published']);
         /** @type {string} */ var key = self_.getKey(date);
-        /** @type {Object} */ var attachment = item['object']['attachments'] &&
-                                               item['object']['attachments'][0];
+        /** @type {?Object} */ var attachment = item['object']['attachments'] &&
+                                                item['object']['attachments'][0];
         /** @type {string} */ var text = item['object']['content'] ||
                                          item['title'];
 
@@ -63,8 +63,8 @@ reader.Google = function() {
 
   function findMedia_(item, extractor) {
     /** @type {string} */ var html = '';
-    /** @type {Object} */ var attachment = item['object']['attachments'] &&
-                                           item['object']['attachments'][0];
+    /** @type {?Object} */ var attachment = item['object']['attachments'] &&
+                                            item['object']['attachments'][0];
     /** @type {string} */ var image = attachment && attachment['image'] &&
                                       attachment['image']['url'];
 

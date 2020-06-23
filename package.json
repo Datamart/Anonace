@@ -1,0 +1,24 @@
+{
+  "name": "Anonace",
+  "version": "2.4.1",
+  "description": "Read your favorite authors, influencers and brands, follow your interests by topics and hashtags. Free. Anonymously. Securely. No sign-up. No ads.",
+  "homepage": "https://anonace.com/",
+  "bugs": {
+    "url": "https://github.com/Datamart/Anonace/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Datamart/Anonace.git"
+  },
+  "license": "Apache-2.0",
+  "main": "src",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "cd bin && ./build"
+  },
+  "author": {
+    "name": "Valentin Podkamennyi",
+    "email": "valentin@dtm.io",
+    "url": "https://vpodk.com/"
+  }
+}

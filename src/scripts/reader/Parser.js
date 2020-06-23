@@ -17,11 +17,11 @@
 reader.Parser = function() {
 
   /**
-   * @param {Array.<!Object>} data List of data items.
+   * @param {!Array.<!Object>} data List of data items.
    * @param {!reader.MediaExtractor} extractor The media extractor.
    * @return {!Object.<string, *>}
    */
-  this.parse = function(data, extractor) {return {}};
+  this.parse = function(data, extractor) {return {};};
 
   /**
    * Encodes query string. Can be overwritten in sub-classes.

@@ -101,7 +101,7 @@ reader.Api = function() {
   var self_ = this;
 
   /**
-   * @type {Object.<string, *>}
+   * @type {!Object.<string, *>}
    * @private
    */
   var cache_ = {};

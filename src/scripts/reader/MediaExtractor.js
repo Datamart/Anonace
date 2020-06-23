@@ -51,7 +51,7 @@ reader.MediaExtractor = function(api) {
     api.proxy(url, function(res) {
       /** @type {string} */ var content = (res[0] || '');
       if (content) {
-        /** @type {Element} */ var element = dom.createElement('div');
+        /** @type {?Element} */ var element = dom.createElement('div');
         element.innerHTML = content.replace(
             TAGS_PATTERN, '<br ').replace(
             /background(-image)\s*\:/img, 'tmp:'); //.substr(0, 2048);

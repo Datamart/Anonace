@@ -1,0 +1,287 @@
+#!/bin/bash
+#
+# Builds the application bundle.
+# See: https://google.github.io/styleguide/shell.xml
+# See: https://github.com/google/closure-stylesheets
+# See: https://developers.google.com/closure/compiler/
+
+set -e
+
+readonly CWD=$(cd $(dirname $0); pwd)
+readonly LIB="${CWD}/lib"
+readonly TMP="${CWD}/tmp"
+
+readonly SRC_PATH="${CWD}/../src"
+readonly APP_PATH="${CWD}/../www"
+readonly PAGES=('index.html' 'technical-information/index.html')
+
+readonly SRC_SERVICE_WORKER="${SRC_PATH}/sw.js"
+readonly APP_SERVICE_WORKER="${APP_PATH}/sw.js"
+
+readonly JS_COMPILED="${APP_PATH}/bundle.js"
+readonly JS_SOURCES="${SRC_PATH}/scripts"
+readonly CSS_COMPILED="${APP_PATH}/bundle.css"
+readonly CSS_SOURCES="${SRC_PATH}/styles"
+readonly HTML_BUNDLE="${APP_PATH}/bundle.html"
+readonly HTML_SOURCES="${SRC_PATH}/templates"
+readonly PACKAGE_JSON="${CWD}/../package.json"
+
+readonly BUILD_DATE="$(date +%Y-%m-%d)"
+readonly APP_VERSION=$(node -pe 'JSON.parse(process.argv[1]).version' "$(cat ${PACKAGE_JSON})")
+
+readonly CSS_PATTERN="<link rel=\"stylesheet\" href=\"./bundle.css\">"
+readonly JS_PATTERN="<script src=\"./bundle.js\"></script>"
+readonly HTML_PATTERN="<!-- @HTML_TEMPLATES -->"
+
+readonly WGET="$(which wget)"
+readonly CURL="$(which curl)"
+readonly UNZIP="$(which unzip)"
+readonly PYTHON="$(which python)"
+readonly JAVA="$(which java)"
+# Hot fix for clean installation of OS X El Capitan.
+readonly JAVA_OSX="/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin/java"
+
+readonly CSS_COMPILER_URL="https://github.com/google/closure-stylesheets/releases/download/v1.5.0/closure-stylesheets.jar"
+readonly CSS_COMPILER_JAR="${LIB}/closure-stylesheets.jar"
+
+# https://github.com/google/closure-compiler/wiki/Binary-Downloads
+readonly JS_COMPILER_ZIP="compiler-latest.zip"
+# readonly JS_COMPILER_ZIP="compiler-20200204.zip"
+readonly JS_COMPILER_URL="http://dl.google.com/closure-compiler/${JS_COMPILER_ZIP}"
+readonly JS_COMPILER_JAR="${LIB}/compiler.jar"
+
+#
+# Downloads closure stylesheets compiler.
+#
+function download() {
+  if [[ ! -f "${CSS_COMPILER_JAR}" ]]; then
+    echo -n "Downloading closure stylesheets compiler: "
+    if [[ -n "$CURL" ]]; then
+      $CURL --silent -L "${CSS_COMPILER_URL}" > "${CSS_COMPILER_JAR}"
+    else
+      $WGET --quiet "${CSS_COMPILER_URL}" -O "${CSS_COMPILER_JAR}"
+    fi
+    echo "Done"
+  fi
+
+  if [[ ! -f "${JS_COMPILER_JAR}" ]]; then
+    cd "${TMP}"
+
+    echo -n "Downloading closure compiler: "
+    if [[ -n "$CURL" ]]; then
+      $CURL --silent -L "${JS_COMPILER_URL}" > "${TMP}/${JS_COMPILER_ZIP}"
+    else
+      $WGET --quiet "${JS_COMPILER_URL}" -O "${TMP}/${JS_COMPILER_ZIP}"
+    fi
+    echo "Done"
+
+    echo -n "Extracting closure compiler: "
+    $UNZIP -q "${TMP}/${JS_COMPILER_ZIP}" -d "${LIB}"
+    if [[ ! -f "${JS_COMPILER_JAR}" ]]; then
+      mv "${LIB}"/*compiler*.jar "${JS_COMPILER_JAR}"
+    fi
+    echo "Done"
+
+    cd "${CWD}"
+  fi
+}
+
+#
+# Creates a templates bundle.
+#
+function compile_html() {
+  echo -n "Creating templates bundle: "
+  [[ -e "${HTML_BUNDLE}" ]] && rm "${HTML_BUNDLE}"
+
+  if [[ -d "${HTML_SOURCES}" ]]; then
+    for entry in "${HTML_SOURCES}"/*.html; do
+      if [[ -f "$entry" ]]; then
+        name=$(basename $entry)
+        echo -n "<script type=\"text/template\" id=\"${name%.*}-template\">" >> "${HTML_BUNDLE}"
+        cat "$entry" | tr -s '\r\n[:blank:]' ' ' >> "${HTML_BUNDLE}"
+        echo -n "</script>" >> "${HTML_BUNDLE}"
+      fi
+    done
+  else
+    echo -n "[WARN] Directory '${HTML_SOURCES}' doesn't exist. "
+  fi
+
+  echo "Done"
+}
+
+#
+# Runs closure stylesheets compiler.
+#
+function compile_css() {
+  echo -n "Running closure stylesheets compiler: "
+  local JAVA_BIN="${JAVA}"
+  if [[ -f "${JAVA_OSX}" ]]; then
+    JAVA_BIN="${JAVA_OSX}"
+  fi
+
+  if [[ -d "${CSS_SOURCES}" ]]; then
+    rm -rf "${CSS_COMPILED}"
+    touch "${CSS_COMPILED}" && chmod 0666 "${CSS_COMPILED}"
+
+    find "${CSS_SOURCES}" -name "*.css" -print \
+      | sed 's/.*/ &/' \
+      | xargs "${JAVA_BIN}" -jar "${CSS_COMPILER_JAR}" \
+          --allow-unrecognized-properties \
+          --output-file "${CSS_COMPILED}"
+  else
+    echo -n "[WARN] Directory '${CSS_SOURCES}' doesn't exist. "
+  fi
+  echo "Done"
+}
+
+#
+# Runs closure compiler.
+#
+function compile_js() {
+  echo -n "Running closure compiler: "
+  local JAVA_BIN="${JAVA}"
+  if [[ -f "${JAVA_OSX}" ]]; then
+    JAVA_BIN="${JAVA_OSX}"
+  fi
+
+  if [[ -d "${JS_SOURCES}" ]]; then
+    rm -rf "${JS_COMPILED}"
+    touch "${JS_COMPILED}" && chmod 0666 "${JS_COMPILED}"
+    echo "var module={exports:{}};" > externs.js
+
+    find "${JS_SOURCES}" -name "*.js" -print \
+      | sed 's/__/AAA/g' | sort \
+      | sed 's/AAA/__/g' \
+      | sed 's/.*/ &/' \
+      | xargs "${JAVA_BIN}" -jar "${JS_COMPILER_JAR}" \
+          --compilation_level ADVANCED \
+          --jscomp_warning=lintChecks \
+          --warning_level VERBOSE \
+          --charset UTF-8 \
+          --use_types_for_optimization \
+          --language_out STABLE \
+          --externs externs.js \
+          --rewrite_polyfills=false \
+          --define 'ENABLE_DEBUG=false' \
+          --js_output_file "${JS_COMPILED}"
+
+    echo "(function(){" | cat - "${JS_COMPILED}" > "${TMP}/out" && mv "${TMP}/out" "${JS_COMPILED}"
+    echo '})();' >> "${JS_COMPILED}"
+    rm externs.js
+  else
+    echo -n "[WARN] Directory '${JS_SOURCES}' doesn't exist. "
+  fi
+
+  echo "Done"
+}
+
+#
+# Copies the application assets.
+#
+function copy_assets() {
+  echo -n "Coping the application assets: "
+
+  local FILES=('favicon.ico' 'manifest.json' 'robots.txt')
+  for filename in "${FILES[@]}"; do
+    [[ -f "${SRC_PATH}/${filename}" ]] && cp "${SRC_PATH}/${filename}" "${APP_PATH}"
+  done
+
+  mkdir -p "${APP_PATH}/images"
+  # cp -r "${SRC_PATH}/images/" "${APP_PATH}/images"
+  cd "${SRC_PATH}/images"
+  cp -rv `ls -A | grep -vE ".svg"` "${APP_PATH}/images/" >> /dev/null
+  cd "${CWD}"
+
+  echo "Done"
+}
+
+#
+# Builds the application bundle.
+#
+function build_app() {
+  echo -n "Building the application bundle: "
+
+  local BUNDLE_CSS=$(<"${CSS_COMPILED}")
+  local BUNDLE_JS=$(<"${JS_COMPILED}")
+  local BUNDLE_HTML=$([[ -f "${HTML_BUNDLE}" ]] && $(<"${HTML_BUNDLE}"))
+  local OS_NAME=$(uname)
+
+  for filepath in "${PAGES[@]}"; do
+    TEMPLATE=$(<"${SRC_PATH}/${filepath}")
+    COMPILED="${APP_PATH}/${filepath}"
+
+    $PYTHON -c "import sys;print(sys.argv[1].replace('${JS_PATTERN}', sys.argv[2]).replace('${CSS_PATTERN}', sys.argv[3]).replace('${HTML_PATTERN}', sys.argv[4]))" \
+        "${TEMPLATE}" "<script>${BUNDLE_JS}</script>" "<style>${BUNDLE_CSS}</style>" "${BUNDLE_HTML}" > "${COMPILED}"
+
+    cat "${COMPILED}" | tr -s '\r\n[:blank:]' ' ' > "${COMPILED}.back"
+    mv "${COMPILED}.back" "${COMPILED}"
+
+    if [[ "Darwin" == "${OS_NAME}" ]]; then
+      sed -i .back s/"@BUILD_DATE"/"${BUILD_DATE}"/g "${COMPILED}"
+      sed -i .back s/"@APP_VERSION"/"${APP_VERSION}"/g "${COMPILED}"
+      sed -i .back 's/> </></g' "${COMPILED}"
+      [[ -e "${COMPILED}.back" ]] && rm "${COMPILED}.back"
+    else
+      sed -i s/"@BUILD_DATE"/"${BUILD_DATE}"/g "${COMPILED}"
+      sed -i s/"@APP_VERSION"/"${APP_VERSION}"/g "${COMPILED}"
+      sed -i 's/> </></g' "${COMPILED}"
+    fi
+  done
+
+  [[ -e "${JS_COMPILED}" ]] && rm "${JS_COMPILED}"
+  [[ -e "${CSS_COMPILED}" ]] && rm "${CSS_COMPILED}"
+  [[ -e "${HTML_BUNDLE}" ]] && rm "${HTML_BUNDLE}"
+
+  echo "Done"
+}
+
+#
+# Creates the service worker.
+#
+function create_service_worker() {
+  echo -n "Creating service worker: "
+
+  local CACHE_KEY="$(date +%Y%m%d-%H%M%S)"
+  local JAVA_BIN="${JAVA}"
+  if [[ -f "${JAVA_OSX}" ]]; then
+    JAVA_BIN="${JAVA_OSX}"
+  fi
+
+  if [[ -f "${SRC_SERVICE_WORKER}" ]]; then
+    "${JAVA_BIN}" -jar "${JS_COMPILER_JAR}" \
+            --compilation_level ADVANCED \
+            --jscomp_warning=lintChecks \
+            --warning_level VERBOSE \
+            --charset UTF-8 \
+            --use_types_for_optimization \
+            --language_out STABLE \
+            --rewrite_polyfills=false \
+            --define="CACHE_KEY='${CACHE_KEY}'" \
+            --js_output_file "${APP_SERVICE_WORKER}" "${SRC_SERVICE_WORKER}"
+  else
+    echo -n "[WARN] File '${SRC_SERVICE_WORKER}' doesn't exist. "
+  fi
+
+  echo "Done"
+}
+
+#
+# The main function.
+#
+function main() {
+  mkdir -p "${LIB}"
+  mkdir -p "${TMP}"
+
+  download
+  compile_css
+  compile_js
+  compile_html
+  # copy_assets
+  build_app
+  create_service_worker
+
+  rm -rf "${TMP}"
+  rm -rf "${LIB}"
+}
+
+main "$@"

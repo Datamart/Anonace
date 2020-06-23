@@ -33,13 +33,13 @@ reader.Twitter = function() {
   };
 
   /**
-   * @param {Array.<!Object>} data List of twits.
+   * @param {!Array.<!Object>} data List of twits.
    * @param {!reader.MediaExtractor} extractor The media extractor.
    * @return {!Object.<string, *>}
    * @override
    */
   this.parse = function(data, extractor) {
-    /** @type {!Object.<string, Array>} */ var result = {};
+    /** @type {!Object.<string, !Array>} */ var result = {};
     /** @type {number} */ var length = data.length;
 
     for (; length--;) {

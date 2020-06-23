@@ -113,7 +113,7 @@ reader.App = function() {
 
           if (length) {
             for (; length--;) {
-              /** @type {Object} */ var item = data[length];
+              /** @type {!Object} */ var item = data[length];
               /** @type {string} */ var value = item['screen_name'] ?
                   ('@' + item['screen_name']) : item['hashtag'];
               if (value) {
@@ -341,7 +341,7 @@ reader.App = function() {
         });
 
     /** @type {!Object.<string, number>} */ var data = config_.get();
-    /** @type {Element} */ var sidebar = dom.getElementById('sidebar');
+    /** @type {?Element} */ var sidebar = dom.getElementById('sidebar');
 
     dom.events.addEventListener(
         dom.getElementById('settings-button'),

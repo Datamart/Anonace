@@ -1,0 +1,90 @@
+#!/bin/bash
+#
+# Builds the application bundle.
+# See: https://google.github.io/styleguide/shell.xml
+# See: https://github.com/google/closure-stylesheets
+# See: https://developers.google.com/closure/compiler/
+
+set -e
+
+readonly CWD=$(cd $(dirname $0); pwd)
+
+readonly SRC_PATH="${CWD}/../src"
+
+readonly JS_BUNDLE="${SRC_PATH}/bundle.js"
+readonly JS_SOURCES="${SRC_PATH}/scripts"
+
+readonly CSS_BUNDLE="${SRC_PATH}/bundle.css"
+readonly CSS_SOURCES="${SRC_PATH}/styles"
+
+#
+# Creates a CSS bundle.
+#
+function bundle_css() {
+  echo -n "Creating CSS bundle: "
+
+  rm -rf "${CSS_BUNDLE}"
+  touch "${CSS_BUNDLE}" && chmod 0666 "${CSS_BUNDLE}"
+
+  if [[ -d "${CSS_SOURCES}" ]]; then
+    echo -e "/**\n * This file is auto-generated and emulates a CSS bundle.\n */" >> "${CSS_BUNDLE}"
+    for entry in "${CSS_SOURCES}"/*.css; do
+      if [[ -f "$entry" ]]; then
+        name=$(basename $entry)
+        echo "@import './styles/${name}';" >> "${CSS_BUNDLE}"
+      fi
+    done
+  else
+    echo -n "[WARN] Directory '${CSS_SOURCES}' doesn't exist."
+  fi
+
+  echo "Done"
+}
+
+#
+# Creates a JS bundle.
+#
+function bundle_js() {
+  echo -n "Creating JS bundle: "
+
+  rm -rf "${JS_BUNDLE}"
+  touch "${JS_BUNDLE}" && chmod 0666 "${JS_BUNDLE}"
+
+  if [[ -d "${JS_SOURCES}" ]]; then
+    echo -e "/**\n * This file is auto-generated and emulates a JS bundle.\n */" >> "${JS_BUNDLE}"
+
+    echo "(function() {" >> "${JS_BUNDLE}"
+    echo "  const sorter = (a, b) => a.indexOf('__') > 0 ? -1 :" >> "${JS_BUNDLE}"
+    echo "                           a.toLowerCase() < b.toLowerCase() ? -1 : 1;" >> "${JS_BUNDLE}"
+    echo "  const scripts = [];" >> "${JS_BUNDLE}"
+    local files=$(find "${JS_SOURCES}" -name '*.js')
+
+    for entry in $files; do
+      if [[ -f "$entry" ]]; then
+        local path=${entry#*"$JS_SOURCES"}
+        echo "  scripts.push('${path}');" >> "${JS_BUNDLE}"
+      fi
+    done
+
+    echo "  scripts.sort(sorter);" >> "${JS_BUNDLE}"
+    echo "  for(let i = 0; i < scripts.length; i++) {" >> "${JS_BUNDLE}"
+    echo "    document.write('<script src=\"./scripts' + scripts[i] + '\"></script>');" >> "${JS_BUNDLE}"
+    echo "  }" >> "${JS_BUNDLE}"
+    echo "})();" >> "${JS_BUNDLE}"
+
+  else
+    echo -n "[WARN] Directory '${JS_SOURCES}' doesn't exist."
+  fi
+
+  echo "Done"
+}
+
+#
+# The main function.
+#
+function main() {
+  bundle_css
+  bundle_js
+}
+
+main "$@"

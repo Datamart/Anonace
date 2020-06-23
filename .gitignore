@@ -4,9 +4,7 @@
 *.so
 *.back
 .DS_Store
-build/lib
+bin/lib
 www/technical-information/
-www/bundle.css
-www/bundle.js
 www/index.html
 www/sw.js

@@ -16,9 +16,9 @@ reader.Reddit = function() {
   reader.Parser.call(this);
 
   /**
-   * @param {Array.<!Object>} data List of twits.
+   * @param {!Array.<!Object>} data List of posts.
    * @param {!reader.MediaExtractor} extractor The media extractor.
-   * @return {!Object.<string, Array>}
+   * @return {!Object.<string, !Array>}
    * @override
    */
   this.parse = function(data, extractor) {
