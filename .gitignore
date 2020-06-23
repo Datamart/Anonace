@@ -5,6 +5,8 @@
 *.back
 .DS_Store
 bin/lib
+src/bundle.js
+src/bundle.css
 www/technical-information/
 www/index.html
 www/sw.js
