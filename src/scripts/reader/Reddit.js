@@ -108,7 +108,7 @@ reader.Reddit = function() {
       // html = html.replace('<iframe ', '<iframe sandbox ');
 
       if (~html.indexOf('i.imgur.com')) {
-        var str = util.StringUtils.URI.decode(html);
+        var str = decodeURIComponent(html);
         var matches = str.match(/image=([^\?]*)/);
         var url = matches && matches[1];
         if (url && !url.indexOf('http')) {

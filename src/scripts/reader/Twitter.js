@@ -4,8 +4,6 @@
  * @see http://google.github.io/styleguide/javascriptguide.xml
  * @see http://developers.google.com/closure/compiler/docs/js-for-compiler
  * @see https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/tweet-object
- *
- * @requires util.StringUtils.URI
  */
 
 
@@ -17,10 +15,10 @@
 reader.Twitter = function() {
   reader.Parser.call(this);
 
-  /** @const {string} */ var BASE_URL = 'https://twitter.com/';
-  /** @const {string} */ var STATUS_URL = 'https://twitter.com/web/status/';
-  /** @const {string} */ var HASHTAG_URI = 'https://twitter.com/hashtag/';
-  /** @const {!RegExp} */ var LINK_PATTERN = /https?:\/\/t\.co\/\w+/img;
+  /** @const {string} */ const BASE_URL = 'https://twitter.com/';
+  /** @const {string} */ const STATUS_URL = 'https://twitter.com/web/status/';
+  /** @const {string} */ const HASHTAG_URI = 'https://twitter.com/hashtag/';
+  /** @const {!RegExp} */ const LINK_PATTERN = /https?:\/\/t\.co\/\w+/img;
 
   /**
    * Encodes query string.
@@ -29,7 +27,7 @@ reader.Twitter = function() {
    * @override
    */
   this.encodeQuery = function(query) {
-    return util.StringUtils.URI.encode(query.split(',').join(' OR '));
+    return encodeURIComponent(query.split(',').join(' OR '));
   };
 
   /**
@@ -39,17 +37,17 @@ reader.Twitter = function() {
    * @override
    */
   this.parse = function(data, extractor) {
-    /** @type {!Object.<string, !Array>} */ var result = {};
-    /** @type {number} */ var length = data.length;
+    /** @type {!Object<string, !Array>} */ const result = {};
+    /** @type {number} */ let length = data.length;
 
     for (; length--;) {
-      /** @type {!Object} */ var item = data[length];
+      /** @type {!Object} */ const item = data[length];
       if (item && item['id_str']) {
-        /** @type {string} */ var text = item['full_text'] ||
+        /** @type {string} */ let text = item['full_text'] ||
                                          item['text'] || '';
-        /** @type {!Object} */ var user = item['user'] || {};
-        /** @type {!Date} */ var date = new Date(item['created_at']);
-        /** @type {string} */ var key = self_.getKey(date);
+        /** @type {!Object} */ let user = item['user'] || {};
+        /** @type {!Date} */ let date = new Date(item['created_at']);
+        /** @type {string} */ let key = self_.getKey(date);
 
         if (item['retweeted_status'] && text.indexOf('RT @') == 0) {
           text = text.split(': ')[0] + ': ' +
@@ -81,23 +79,23 @@ reader.Twitter = function() {
   };
 
   function findMedia_(item, extractor) {
-    var media = ((item['extended_entities'] || {})['media'] || [])[0];
-    var url = media && media['media_url_https'];
-    var status = STATUS_URL + item['id_str'];
+    let media = ((item['extended_entities'] || {})['media'] || [])[0];
+    const url = media && media['media_url_https'];
+    const status = STATUS_URL + item['id_str'];
 
     if (url && url.indexOf('https:') == 0) {
       item['media'] = self_.getImageHtml(url, status);
     } else {
       media = ((item['entities'] || {})['urls'] || [])[0];
       extractor.extract(media && media['expanded_url'], function(media) {
-        var html = '';
+        let html = '';
         if ('image' == media['type']) {
           html = self_.getImageHtml(media['url'], status);
         } else if ('youtube' == media['type']) {
           html = self_.getYoutubeHtml(media['url']);
         }
 
-        var div = dom.getElementById('media-' + item['id_str']);
+        const div = dom.getElementById('media-' + item['id_str']);
         if (div) {
           div.innerHTML = html;
         } else {
@@ -115,5 +113,5 @@ reader.Twitter = function() {
    * @type {!reader.Twitter}
    * @private
    */
-  var self_ = this;
+  const self_ = this;
 };

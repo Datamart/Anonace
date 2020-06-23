@@ -7,6 +7,13 @@
 
 
 /**
+ * Indicates a constant that can be overridden by the compiler at compile-time.
+ * @define {boolean}
+ */
+const ENABLE_DEBUG = true;
+
+
+/**
  * Defines <code>reader</code> namespace.
  * @namespace
  */
@@ -332,8 +339,9 @@ reader.App = function() {
   }
 
   function initHeaderControls_() {
-    dom.events.addEventListener(
-        dom.getElementById('update-button'),
+    let /** ?Element */ node = dom.getElementById('update-button');
+    node && dom.events.addEventListener(
+        /** @type {!Node} */ (node),
         dom.events.TYPE.CLICK, function(e) {
           dom.events.preventDefault(e);
           api.cacheEnabled = false;
@@ -343,8 +351,9 @@ reader.App = function() {
     /** @type {!Object.<string, number>} */ var data = config_.get();
     /** @type {?Element} */ var sidebar = dom.getElementById('sidebar');
 
-    dom.events.addEventListener(
-        dom.getElementById('settings-button'),
+    node = dom.getElementById('settings-button');
+    node && dom.events.addEventListener(
+        /** @type {!Node} */ (node),
         dom.events.TYPE.CLICK, function(e) {
           dom.events.preventDefault(e);
           dom.css.toggleClass(sidebar, 'open');
@@ -444,8 +453,9 @@ reader.App = function() {
   init_();
 };
 
-// For "bundle-debug.js"
-setTimeout(function() { new reader.App; }, 99);
 
-// Comment this while debug mode.
-//new reader.App;
+if (ENABLE_DEBUG) {
+  setTimeout(function() { new reader.App; }, 99);
+} else {
+  new reader.App;
+}

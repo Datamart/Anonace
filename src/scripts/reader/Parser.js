@@ -6,7 +6,6 @@
  *
  * @requires dom.Template
  * @requires formatters.DateFormatter
- * @requires util.StringUtils.URI
  */
 
 
@@ -29,7 +28,7 @@ reader.Parser = function() {
    * @return {string} Returns encoded query string.
    */
   this.encodeQuery = function(query) {
-    return util.StringUtils.URI.encode(query);
+    return encodeURIComponent(query);
   };
 
   /**

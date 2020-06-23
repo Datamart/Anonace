@@ -4,8 +4,6 @@
  * @see http://google.github.io/styleguide/javascriptguide.xml
  * @see http://developers.google.com/closure/compiler/docs/js-for-compiler
  * @see https://developers.google.com/+/web/api/rest/latest/activities
- *
- * @requires util.StringUtils.URI
  */
 
 
