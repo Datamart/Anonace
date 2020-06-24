@@ -66,6 +66,12 @@ a {
   width: 24px;
 }
 
+table.box button {
+  border: solid 1px;
+  border-radius: 5px;
+  padding: 9px 15px;
+}
+
 .interests form table,
 .interests input[type="text"],
 .interests button {

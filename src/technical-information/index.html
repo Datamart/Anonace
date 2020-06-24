@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5">
-<!-- html markup -->
+<meta name="robots" content="noindex">
 <title>AnonAce - Technical information.</title>
 <link rel="canonical" href="https://anonace.com/technical-information/">
 <link rel="stylesheet" href="./bundle.css">
@@ -13,7 +13,7 @@
 #content th {padding-top:1em}
 </style>
 </head>
-<body data-class="no-js">
+<body>
 <div class="container">
   <div class="header">
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -35,15 +35,26 @@
   </noscript>
   <div id="content">
     <script>
-    var orientation = screen.orientation;
-    var orientationAngle = (orientation ? orientation.angle : window.orientation) + '°';
-    var orientationType = orientation ? orientation.type :
-            ((Math.abs(window.orientation) === 90) ? 'Landscape' : 'Portrait');
+    var isPortrait = window.innerHeight > window.innerWidth;
+    var orientationType = isPortrait ? 'Portrait' : 'Landscape';
+    var orientationAngle = isPortrait ? 0 : 90;
     var isStandalone = navigator.standalone ||
-           window.matchMedia('(display-mode: standalone)').matches ||
-           0 < navigator.userAgent.toLowerCase().indexOf('anonace');
+                       window.matchMedia('(display-mode: standalone)').matches ||
+                       0 < navigator.userAgent.toLowerCase().indexOf('anonace');
+
+    if (screen.orientation) {
+      if (screen.orientation.angle) {
+        orientationAngle = screen.orientation.angle;
+      }
+      if (screen.orientation.type) {
+        orientationType = screen.orientation.type;
+      }
+    } else if (window.orientation) {
+      orientationAngle = window.orientation;
+      orientationType = Math.abs(window.orientation) === 90 ? 'Landscape' : 'Portrait';
+    }
     </script>
-    <table cellpadding="6" cellspacing="0" class="box">
+    <table cellpadding="0" cellspacing="6" class="box">
       <tbody valign="top">
         <tr><td colspan="2">
           <script>document.currentScript.parentNode.innerHTML = navigator.userAgent</script>
@@ -51,7 +62,7 @@
         <tr><th colspan="2" align="left">Application</th></tr>
         <tr><td>Version:</td><td>@APP_VERSION (@BUILD_DATE)</td></tr>
         <tr><td>Domain:</td>
-          <td><script>document.currentScript.parentNode.innerHTML = document.domain || location.hostname</script></td></tr>
+          <td><script>document.currentScript.parentNode.innerHTML = document.domain || location.hostname || 'dev'</script></td></tr>
         <tr><td>Standalone:</td>
           <td><script>document.currentScript.parentNode.innerHTML = isStandalone</script></td></tr>
         <tr><th colspan="2" align="left">Device</th></tr>
@@ -68,7 +79,9 @@
           <td><script>document.currentScript.parentNode.innerHTML = screen.pixelDepth || screen.colorDepth</script></td></tr>
         <tr><th colspan="2" align="left">Orientation</th></tr>
         <tr><td>Type:</td><td><script>document.currentScript.parentNode.innerHTML = orientationType</script></td></tr>
-        <tr><td>Angle:</td><td><script>document.currentScript.parentNode.innerHTML = orientationAngle</script></td></tr>
+        <tr><td>Angle:</td><td><script>document.currentScript.parentNode.innerHTML = orientationAngle + '°'</script></td></tr>
+        <tr><th colspan="2"></th></tr>
+        <tr><td colspan="2"><button type="button" onclick="history.back()">Back</button></td></tr>
       </tbody>
     </table>
   </div>
