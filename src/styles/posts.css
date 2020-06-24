@@ -71,14 +71,6 @@
   position: relative;
 }
 
-.post .media .frame .cover {
-  height: 100%;
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
-}
-
 .post .media iframe,
 .post .media video {
   align-self: center;
@@ -88,7 +80,37 @@
 }
 
 .post .media .image {
+  display: block;
+  height: auto;
   min-height: 250px;
+  position: relative;
+  text-align: center;
+  width: 100%;
+}
+
+.post .media .image::after {
+  content: "No Image";
+  display: block;
+  padding-top: 7rem;
+}
+
+.post .media .image img {
+  position: absolute;
+}
+
+.post .media .image img:first-child {
+  filter: blur(13px);
+  height: 100%;
+  left: 0;
+  width: 100%;
+}
+
+.post .media .image img:last-child {
+  max-height: 250px;
+  max-width: 100%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .post .media video.controls {

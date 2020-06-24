@@ -1,12 +1,19 @@
 /**
  * Default application CSS theme.
  *
+ * * Please put here only colors and background images.
+ * @see https://en.wikipedia.org/wiki/Web_colors
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/background
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/color
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/opacity
+ *
  * @see https://google.github.io/styleguide/htmlcssguide.html
  * @see https://github.com/google/closure-stylesheets
  */
 
 body,
-button {
+button,
+.post .media .image {
   background: #eee;
   color: #222;
 }
@@ -17,6 +24,10 @@ button {
 .links a,
 .box h3 {
   color: #666;
+}
+
+.post .media .image::after {
+  color: gray;
 }
 
 .box {
@@ -72,6 +83,10 @@ body.dark,
 .dark button {
   background: #212121;
   color: #fff;
+}
+
+.dark .post .media .image {
+  background-color: #444;
 }
 
 .dark .box,

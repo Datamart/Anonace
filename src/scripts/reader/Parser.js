@@ -63,10 +63,15 @@ reader.Parser = function() {
   };
 
   this.getImageHtml = (image, link) => {
-    const /** !Object<string, number> */ data = config_.get();
-    const /** string */ theme = +data['dark-mode'] ? '424242' : 'eee';
+    // const /** !Object<string, number> */ data = config_.get();
+    // const /** string */ theme = +data['dark-mode'] ? '424242' : 'eee';
+    // crossorigin="anonymous" // get it from data
+
+    // https://developer.wordpress.com/docs/photon/api/
+    // image = 'https://i0.wp.com/' + image.split(/^https?:\/\//)[1] + '?h=250';
+
     return self_.parseTemplate(
-        'image-frame', {'image': image, 'link': link, 'theme': theme});
+        'image-frame', {'image': image, 'link': link /*, 'theme': theme*/ });
   };
 
   this.getYoutubeHtml = (url) => {

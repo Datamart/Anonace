@@ -159,10 +159,14 @@
 </script>
 
 <script type="text/template" id="image-frame-template">
-  <div class="frame"><iframe frameborder="0" role="img" class="image" sandbox
-    aria-label="Article image" title="Article image"
-    src="data:text/html,%3Cstyle%3Ebody{background:url('{{ image }}'),url('data:image/svg+xml,%253Csvg style=%2527fill:grey;font:13px arial%2527 xmlns=%2527http://www.w3.org/2000/svg%2527%253E%253Ctext x=%252750%25%2527 y=%252750%25%2527 text-anchor=%2527middle%2527%253ENo image%253C/text%253E%253C/svg%253E');background-color:%23{{ theme }};background-position:center;background-repeat:no-repeat;background-size:contain;height:100%;margin:0;overflow:hidden;padding:0;width:100%}%3C%2Fstyle%3E"></iframe><a href="{{ link }}" rel="external noopener" target="_blank"
-    class="cover" aria-label="Link to the full article."></a></div>
+  <div class="frame">
+    <a href="{{ link }}" rel="external noopener" target="_blank"
+       class="image" aria-label="Link to the full article."><img
+       src="{{ image }}" data-crossorigin="anonymous" referrerpolicy="no-referrer"
+       onerror="this.style.display='none'"
+       onload="this.removeAttribute('onload');this.parentNode.appendChild(this.cloneNode())">
+    </a>
+  </div>
 </script>
 
 <script type="text/template" id="iframe-frame-template">

@@ -17,7 +17,7 @@ const ENABLE_DEBUG = true;
  * Defines <code>reader</code> namespace.
  * @namespace
  */
-var reader = {};
+const reader = {};
 
 
 
@@ -351,11 +351,11 @@ reader.App = function() {
     dom.css.addClass(sidebar, +data[sidebar.id] ? 'open' : '');
   }
 
-  function initDarkMode_() {
-    /** @type {!Object.<string, number>} */ var data = config_.get();
+  const initDarkMode_ = () => {
+    const /** !Object<string, number> */ data = config_.get();
 
     if (!('dark-mode' in data) && dom.context.matchMedia) {
-      var query = '(prefers-color-scheme: dark)';
+      const /** string */ query = '(prefers-color-scheme: dark)';
       data['dark-mode'] = +dom.context.matchMedia(query).matches;
       config_.set(data);
     }
@@ -365,21 +365,26 @@ reader.App = function() {
     } else {
       dom.css.removeClass(dom.document.body, 'dark');
     }
-  }
+  };
 
-  function initPlatform_() {
-    /** @type {string} */ var userAgent = dom.device.userAgent;
+  const initPlatform_ = () => {
+    const /** string */ userAgent = dom.device.userAgent;
 
-    if (/iPad|iPhone|iPod/.test(userAgent) && !dom.context['MSStream']) {
+    // iOS pre 13
+    const /** boolean */ iOS = /iPad|iPhone|iPod/.test(userAgent) &&
+                               !dom.context['MSStream'];
+    // iPad OS 13
+    const /** boolean */ iPadOS = dom.device.platform === 'MacIntel' &&
+                                  dom.device.maxTouchPoints > 1;
+
+    if (iOS || iPadOS) {
       dom.css.addClass(dom.document.body, 'ios');
-    // } else if (/android/i.test(userAgent)) {
-    //   dom.css.addClass(dom.document.body, 'md');
     } else {
       dom.css.addClass(dom.document.body, 'md');
     }
-  }
+  };
 
-  function init_() {
+  const init_ = () => {
     initPlatform_();
     initDarkMode_();
     initForm_();
@@ -389,51 +394,44 @@ reader.App = function() {
     initUserConfig_();
     initContent_();
     dom.css.removeClass(dom.document.body, 'no-js');
-  }
+  };
 
   /**
    * The reference to current class instance.
    * Used in private methods and for preventing jslint errors.
-   * @type {!reader.App}
-   * @private
+   * @private {!reader.App}
    */
-  var self_ = this;
+  const self_ = this;
 
   /**
-   * @type {!Object}
-   * @private
+   * @private {!Object}
    */
-  var content_ = {};
+  let content_ = {};
 
   /**
-   * @type {number}
-   * @private
+   * @private {number}
    */
-  var count_ = 0;
+  let count_ = 0;
 
-  var api = new reader.Api;
-  var interests_ = new reader.DataStorage('interests');
-  var config_ = new reader.DataStorage('config');
-  var extractor_ = new reader.MediaExtractor(api);
-  var worker_ = new reader.Worker;
+  const api = new reader.Api;
+  const interests_ = new reader.DataStorage('interests');
+  const config_ = new reader.DataStorage('config');
+  const extractor_ = new reader.MediaExtractor(api);
+  const worker_ = new reader.Worker;
 
   /**
-   * @type {!Object.<string, !reader.DataStorage>}
-   * @private
+   * @private {!Object<string, !reader.DataStorage>}
    */
-  var settings_ = {
+  const settings_ = {
     'interest': interests_,
     'source': new reader.DataStorage('sources')
   };
 
   /**
-   * @type {!Object.<string, !reader.Parser>}
-   * @private
+   * @private {!Object<string, !reader.Parser>}
    */
-  var sources_ = {
+  const sources_ = {
     'twitter': new reader.Twitter,
-    // Google+ API is deprecated.
-    // 'google': new reader.Google,
     'reddit': new reader.Reddit
   };
 
@@ -442,7 +440,7 @@ reader.App = function() {
 
 
 if (ENABLE_DEBUG) {
-  setTimeout(function() { new reader.App; }, 99);
+  setTimeout(() => { new reader.App; }, 99);
 } else {
   new reader.App;
 }
