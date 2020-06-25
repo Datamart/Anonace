@@ -394,6 +394,8 @@ reader.App = function() {
     initUserConfig_();
     initContent_();
     dom.css.removeClass(dom.document.body, 'no-js');
+
+    // document.referrer.indexOf('android-app://') == 0 // Android TWA
   };
 
   /**

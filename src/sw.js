@@ -21,6 +21,13 @@ const CACHE_KEY = 'CACHE_KEY';
 const BASE_URL = 'https://anonace.com/';
 
 
+self.addEventListener('message', (event) => {
+  if ('version' == event.data.action) {
+    event.ports[0].postMessage({'version': CACHE_KEY});
+  }
+});
+
+
 self.addEventListener('fetch', event => {
   event.respondWith((() => {
     const requestClone = event.request.clone();

@@ -11,6 +11,7 @@
 <style>
 #content {padding-left:0}
 #content th {padding-top:1em}
+#content th a {font-weight: normal;}
 </style>
 </head>
 <body>
@@ -35,12 +36,13 @@
   </noscript>
   <div id="content">
     <script>
-    var isPortrait = window.innerHeight > window.innerWidth;
-    var orientationType = isPortrait ? 'Portrait' : 'Landscape';
-    var orientationAngle = isPortrait ? 0 : 90;
-    var isStandalone = navigator.standalone ||
-                       window.matchMedia('(display-mode: standalone)').matches ||
-                       0 < navigator.userAgent.toLowerCase().indexOf('anonace');
+    const isSecure = 'https:' == location.protocol;
+    const isPortrait = window.innerHeight > window.innerWidth;
+    let orientationType = isPortrait ? 'Portrait' : 'Landscape';
+    let orientationAngle = isPortrait ? 0 : 90;
+    const isStandalone = navigator.standalone ||
+                         window.matchMedia('(display-mode: standalone)').matches ||
+                         0 < navigator.userAgent.toLowerCase().indexOf('anonace');
 
     if (screen.orientation) {
       if (screen.orientation.angle) {
@@ -51,35 +53,85 @@
       }
     } else if (window.orientation) {
       orientationAngle = window.orientation;
-      orientationType = Math.abs(window.orientation) === 90 ? 'Landscape' : 'Portrait';
+      orientationType = 90 == Math.abs(window.orientation) ? 'Landscape' : 'Portrait';
     }
+
+    const updateServiceWorker = () => {
+      if (isSecure && navigator.serviceWorker) {
+        const callback = () => { location.reload(true); };
+
+        navigator.serviceWorker.getRegistration().then((service) => {
+          service ? service.unregister().then(callback) : callback();
+        });
+      }
+    };
+
+    const showServiceWorkerStatus = () => {
+      const container = document.currentScript.parentNode;
+      let status = 'Unsupported';
+      if (isSecure && navigator.serviceWorker) {
+        navigator.serviceWorker.getRegistration().then((service) => {
+          status = service.installing ? 'Installing' :
+                   service.waiting ? 'Installed' :
+                   service.active ? 'Active' : 'Not Installed';
+          container.innerHTML = status;
+        });
+      } else {
+        container.innerHTML = status;
+      }
+    };
+
+    const showServiceWorkerVersion = () => {
+      const container = document.currentScript.parentNode;
+      const controller = navigator.serviceWorker && navigator.serviceWorker.controller;
+      if (controller) {
+        const callback = (data) => {
+          container.innerHTML = (data && data['version']) || 0;
+        };
+        const message = { action: 'version' };
+        const channel = new MessageChannel;
+        channel.port1.onmessage = (event) => { callback(event.data); };
+        controller.postMessage(message, [channel.port2]);
+      } else {
+        container.innerHTML = 0;
+      }
+    };
+
+    const setContent = (content) => {
+      const container = document.currentScript.parentNode;
+      container.textContent = content;
+    };
     </script>
     <table cellpadding="0" cellspacing="6" class="box">
       <tbody valign="top">
-        <tr><td colspan="2">
-          <script>document.currentScript.parentNode.innerHTML = navigator.userAgent</script>
-        </td></tr>
+        <tr><td colspan="2"><script>setContent(navigator.userAgent)</script></td></tr>
         <tr><th colspan="2" align="left">Application</th></tr>
         <tr><td>Version:</td><td>@APP_VERSION (@BUILD_DATE)</td></tr>
         <tr><td>Domain:</td>
-          <td><script>document.currentScript.parentNode.innerHTML = document.domain || location.hostname || 'dev'</script></td></tr>
+          <td><script>setContent(document.domain || location.hostname || 'dev')</script></td></tr>
         <tr><td>Standalone:</td>
-          <td><script>document.currentScript.parentNode.innerHTML = isStandalone</script></td></tr>
+          <td><script>setContent(isStandalone)</script></td></tr>
         <tr><th colspan="2" align="left">Device</th></tr>
         <tr><td>Platform:</td>
-          <td><script>document.currentScript.parentNode.innerHTML = navigator.platform</script></td></tr>
+          <td><script>setContent(navigator.platform)</script></td></tr>
         <tr><td>Online:</td>
-          <td><script>document.currentScript.parentNode.innerHTML = navigator.onLine</script></td></tr>
+          <td><script>setContent(navigator.onLine)</script></td></tr>
         <tr><td>Cookie:</td>
-          <td><script>document.currentScript.parentNode.innerHTML = navigator.cookieEnabled</script></td></tr>
+          <td><script>setContent(navigator.cookieEnabled)</script></td></tr>
         <tr><th colspan="2" align="left">Screen</th></tr>
         <tr><td>Size:</td>
-          <td><script>document.currentScript.parentNode.innerHTML = screen.width + ' x ' + screen.height</script></td></tr>
+          <td><script>setContent(screen.width + ' x ' + screen.height)</script></td></tr>
         <tr><td>Depth:</td>
-          <td><script>document.currentScript.parentNode.innerHTML = screen.pixelDepth || screen.colorDepth</script></td></tr>
+          <td><script>setContent(screen.pixelDepth || screen.colorDepth)</script></td></tr>
         <tr><th colspan="2" align="left">Orientation</th></tr>
-        <tr><td>Type:</td><td><script>document.currentScript.parentNode.innerHTML = orientationType</script></td></tr>
-        <tr><td>Angle:</td><td><script>document.currentScript.parentNode.innerHTML = orientationAngle + '°'</script></td></tr>
+        <tr><td>Type:</td><td><script>setContent(orientationType)</script></td></tr>
+        <tr><td>Angle:</td><td><script>setContent(orientationAngle + '°')</script></td></tr>
+        <tr><th colspan="2" align="left">
+          Service worker &nbsp;
+          <a href="javascript:updateServiceWorker()">Update</a>
+        </th></tr>
+        <tr><td>Version:</td><td>...<script>showServiceWorkerVersion()</script></td></tr>
+        <tr><td>Status:</td><td>...<script>showServiceWorkerStatus()</script></td></tr>
         <tr><th colspan="2"></th></tr>
         <tr><td colspan="2"><button type="button" onclick="history.back()">Back</button></td></tr>
       </tbody>
