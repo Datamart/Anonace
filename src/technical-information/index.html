@@ -71,6 +71,7 @@
       let status = 'Unsupported';
       if (isSecure && navigator.serviceWorker) {
         navigator.serviceWorker.getRegistration().then((service) => {
+          service = service || {};
           status = service.installing ? 'Installing' :
                    service.waiting ? 'Installed' :
                    service.active ? 'Active' : 'Not Installed';
