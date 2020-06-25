@@ -4,6 +4,7 @@
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5">
+<meta name="google" content="notranslate">
 <meta name="robots" content="noindex">
 <title>AnonAce - Technical information.</title>
 <link rel="canonical" href="https://anonace.com/technical-information/">
@@ -11,7 +12,9 @@
 <style>
 #content {padding-left:0}
 #content th {padding-top:1em}
-#content th a {font-weight: normal;}
+#content th a {font-weight:normal;display:none}
+.sw-active #content th a,
+.sw-installed #content th a {display:inline-block}
 </style>
 </head>
 <body>
@@ -76,6 +79,7 @@
                    service.waiting ? 'Installed' :
                    service.active ? 'Active' : 'Not Installed';
           container.innerHTML = status;
+          document.body.className = 'sw-' + status.toLowerCase();
         });
       } else {
         container.innerHTML = status;
