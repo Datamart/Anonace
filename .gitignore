@@ -6,7 +6,8 @@
 .DS_Store
 build/lib
 www
-www/bundle.css
-www/bundle.js
+src
+src/bundle.css
+src/bundle.js
 www/index.html
 www/sw.js
