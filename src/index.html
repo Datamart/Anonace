@@ -164,6 +164,7 @@
     <a href="{{ link }}" rel="external noopener" target="_blank"
        class="image" aria-label="Link to the full article."><img
        src="{{ image }}" data-crossorigin="anonymous" referrerpolicy="no-referrer"
+       loading="lazy" height="250"
        onerror="this.style.display='none'"
        onload="this.removeAttribute('onload');this.parentNode.appendChild(this.cloneNode())">
     </a>
@@ -171,7 +172,9 @@
 </script>
 
 <script type="text/template" id="iframe-frame-template">
-  <div class="frame"><iframe src="{{ url }}" frameborder="0" title="Framed content"></iframe></div>
+  <div class="frame">
+    <iframe loading="lazy" src="{{ url }}" frameborder="0" title="Framed content"></iframe>
+  </div>
 </script>
 
 <script type="text/template" id="reddit-video-template">
@@ -236,7 +239,7 @@
     <table class="footer" border="0" cellpadding="0" cellspacing="0">
       <tr>
         <th width="20"><iframe width="20" frameborder="0" sandbox
-            aria-label="Author avatar" title="Author avatar"
+            aria-label="Author avatar" title="Author avatar" loading="lazy"
             src="data:text/html,%3Cstyle%3Ebody{background:url('{{ author_avatar }}') center%2Fcover no-repeat;height:100%;margin:0;overflow:hidden;padding:0;width:100%}%3C%2Fstyle%3E"></iframe></th>
         <th><a href="{{ author_link }}" rel="external noopener author"
                class="author" target="_blank">{{ author_name }}</a></th>

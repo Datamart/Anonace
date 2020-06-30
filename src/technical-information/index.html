@@ -13,8 +13,7 @@
 #content {padding-left:0}
 #content th {padding-top:1em}
 #content th a {font-weight:normal;display:none}
-.sw-active #content th a,
-.sw-installed #content th a {display:inline-block}
+.sw-update #content th a {display:inline-block}
 </style>
 </head>
 <body>
@@ -46,6 +45,8 @@
     const isStandalone = navigator.standalone ||
                          window.matchMedia('(display-mode: standalone)').matches ||
                          0 < navigator.userAgent.toLowerCase().indexOf('anonace');
+    const worker = navigator.serviceWorker;
+    let isReloading;
 
     if (screen.orientation) {
       if (screen.orientation.angle) {
@@ -59,46 +60,52 @@
       orientationType = 90 == Math.abs(window.orientation) ? 'Landscape' : 'Portrait';
     }
 
-    const updateServiceWorker = () => {
-      if (isSecure && navigator.serviceWorker) {
-        const callback = () => { location.reload(true); };
-
-        navigator.serviceWorker.getRegistration().then((service) => {
-          service ? service.unregister().then(callback) : callback();
-        });
+    const reloadApp = () => {
+      if (!isReloading) {
+        isReloading = 1;
+        location.reload(true);
       }
     };
 
     const showServiceWorkerStatus = () => {
       const container = document.currentScript.parentNode;
       let status = 'Unsupported';
-      if (isSecure && navigator.serviceWorker) {
-        navigator.serviceWorker.getRegistration().then((service) => {
+
+      if (isSecure && worker) {
+        worker.getRegistration().then((service) => {
           service = service || {};
           status = service.installing ? 'Installing' :
                    service.waiting ? 'Installed' :
                    service.active ? 'Active' : 'Not Installed';
           container.innerHTML = status;
-          document.body.className = 'sw-' + status.toLowerCase();
         });
       } else {
         container.innerHTML = status;
       }
     };
 
-    const showServiceWorkerVersion = () => {
+    const initServiceWorker = () => {
       const container = document.currentScript.parentNode;
-      const controller = navigator.serviceWorker && navigator.serviceWorker.controller;
-      if (controller) {
-        const callback = (data) => {
-          container.innerHTML = (data && data['version']) || 0;
-        };
-        const message = { action: 'version' };
-        const channel = new MessageChannel;
-        channel.port1.onmessage = (event) => { callback(event.data); };
-        controller.postMessage(message, [channel.port2]);
-      } else {
-        container.innerHTML = 0;
+      const listeners = {
+        getVersion: (data) => {
+          container.innerHTML = (data && data['getVersion']) || 0;
+        },
+        refresh: (data) => {
+          document.body.className = 'sw-update';
+        }
+      };
+
+      if (worker) {
+        worker.addEventListener('message', (event) => {
+          (listeners[event.data.action] || console.log)(event.data);
+        });
+
+        if (worker.controller) {
+          worker.controller.postMessage({action: 'getVersion'});
+        } else {
+          container.innerHTML = 0;
+          worker.register('../sw.js');
+        }
       }
     };
 
@@ -133,9 +140,9 @@
         <tr><td>Angle:</td><td><script>setContent(orientationAngle + '°')</script></td></tr>
         <tr><th colspan="2" align="left">
           Service worker &nbsp;
-          <a href="javascript:updateServiceWorker()">Update</a>
+          <a href="javascript:reloadApp()">Update</a>
         </th></tr>
-        <tr><td>Version:</td><td>...<script>showServiceWorkerVersion()</script></td></tr>
+        <tr><td>Version:</td><td>...<script>initServiceWorker()</script></td></tr>
         <tr><td>Status:</td><td>...<script>showServiceWorkerStatus()</script></td></tr>
         <tr><th colspan="2"></th></tr>
         <tr><td colspan="2"><button type="button" onclick="history.back()">Back</button></td></tr>
