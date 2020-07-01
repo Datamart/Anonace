@@ -106,6 +106,7 @@
 }
 
 .post .media .image img:last-child {
+  height: auto; /* Clearing img height attribute. */
   max-height: 250px;
   max-width: 100%;
   left: 50%;
