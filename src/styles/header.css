@@ -6,20 +6,20 @@
  */
 
 .header {
-  clear: both;
-  height: 10%;
-  min-height: 32px;
+  height: 46px;
+  padding-top: 5px;
 }
 
-.header table {
-  height: 100%;
-  width: 100%;
+.header .logo {
+  padding: 5px;
 }
 
 .header svg {
-  height: 20%;
-  margin-left: 3px;
   vertical-align: middle;
+}
+
+.header .menu {
+  float: right;
 }
 
 .header a {

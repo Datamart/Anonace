@@ -45,8 +45,8 @@ readonly CSS_COMPILER_URL="https://github.com/google/closure-stylesheets/release
 readonly CSS_COMPILER_JAR="${LIB}/closure-stylesheets.jar"
 
 # https://github.com/google/closure-compiler/wiki/Binary-Downloads
-readonly JS_COMPILER_ZIP="compiler-latest.zip"
-# readonly JS_COMPILER_ZIP="compiler-20200204.zip"
+# readonly JS_COMPILER_ZIP="compiler-latest.zip"
+readonly JS_COMPILER_ZIP="compiler-20200719.zip"
 readonly JS_COMPILER_URL="http://dl.google.com/closure-compiler/${JS_COMPILER_ZIP}"
 readonly JS_COMPILER_JAR="${LIB}/compiler.jar"
 
