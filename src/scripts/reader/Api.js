@@ -17,8 +17,8 @@
 reader.Api = function() {
 
   const /** string */ API_KEY = atob(
-        'QUtmeWNielMtWE5UdVhSVlBOT2lyT3ptUFR4aD' +
-        'IycXI4aWFwMmJEUmtJSGlfTGRwV1hRQzQ0SQ==');
+        'QUtmeWNieXExV3FmdkhEU2ZxZnZkeW5td2UxZnhP' +
+        'MWdEb21IRXE3aHh5LXF3bnpoa19LaTEzaDRodDR5');
 
   const /** string */ API_URL = 'https://script.google.com/macros/s/' +
                                 API_KEY + '/exec';
