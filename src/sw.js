@@ -151,12 +151,11 @@ const initUpdateFoundListener_ = () => {
 const fetchAndCache_ = (request) => {
   let /** !Promise */ result = fetch(request);
   const isJsonpRequest = isJsonpRequest_(request);
-  const JSONP_CACHE_KEY = '/offline.jsonp';
+  const JSONP_CACHE_KEY = isJsonpRequest ? getJsonpCacheKey_(request) : '';
 
   if (isRequiestCacheble_(request) || isJsonpRequest) {
     result = result.then((response) => worker.caches.open(CACHE_KEY).then((cache) => {
-      const key = isJsonpRequest ? JSONP_CACHE_KEY : request;
-      cache.put(key, response.clone());
+      cache.put(JSONP_CACHE_KEY || request, response.clone());
       return response;
     }));
   }
@@ -208,4 +207,65 @@ const getEmptyJsonpResponse_ = (request) => {
   // https://script.google.com/exec?action=search&jsonp=cb123&params=
   const cb = request.url.split('&jsonp=').pop().split('&')[0];
   return fetch(new Request('data:text/javascript,' + cb + '([])'));
+};
+
+
+/**
+ * @param {!Request} request The request to get calback function name.
+ * @return {string} Return JSONP cache key.
+ * @private
+ */
+const getJsonpCacheKey_ = (request) => {
+  // https://script.google.com/exec
+  //   ?action=search
+  //   &source=twitter
+  //   &query=%40vpodk
+  //   &count=5
+  //   &jsonp=jsonp_490978746
+  //
+  // https://script.google.com/exec
+  //   ?action=proxy
+  //   &query=https%3A%2F%2Fmedium.com%2Fswlh%2Fafefe8c7c6c5%3F
+  //   &jsonp=jsonp_714561546
+  //
+  // https://script.google.com/exec
+  //   ?action=typeahead
+  //   &source=twitter
+  //   &query=komito%20analytics
+  //   &count=10
+  //   &jsonp=jsonp_601335910
+  const map = {};
+  const query = request.url.split('?').pop();
+  const pairs = query.split('&');
+  let index = pairs.length >>> 0;
+  while (index--) {
+    const pair = pairs[index].split('=');
+    const key = pair[0];
+    if (key) map[key] = decodeURIComponent(pair[1]);
+  }
+
+  const keys = [map['action'], hash(map['query'])];
+  map['source'] && keys.push(map['source']);
+  return 'offline' + keys.join('-') + '.json';
+};
+
+
+/**
+ * Converts <code>str</code> to hashed string.
+ * @param {string} str The input string.
+ * @return {string} Returns hashed string.
+ * @see https://github.com/Datamart/Glize/blob/master/src/utils/string.js
+ */
+const hash =(str) => {
+  const length = str.length;
+  let result = 0;
+  let j = 0;
+
+  for (let i = 0; i < length;) {
+    result ^= str.charCodeAt(i++) << j;
+    j += 8;
+    j %= 24;
+  }
+
+  return result.toString(36).toUpperCase();
 };
