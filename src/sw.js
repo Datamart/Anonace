@@ -150,20 +150,23 @@ const initUpdateFoundListener_ = () => {
  */
 const fetchAndCache_ = (request) => {
   let /** !Promise */ result = fetch(request);
+  const isJsonpRequest = isJsonpRequest_(request);
+  const JSONP_CACHE_KEY = '/offline.jsonp';
 
-  if (isRequiestCacheble_(request)) {
-    result = result.then((response) => worker.caches.open(CACHE_KEY).then(cache => {
-      cache.put(request, response.clone());
+  if (isRequiestCacheble_(request) || isJsonpRequest) {
+    result = result.then((response) => worker.caches.open(CACHE_KEY).then((cache) => {
+      const key = isJsonpRequest ? JSONP_CACHE_KEY : request;
+      cache.put(key, response.clone());
       return response;
     }));
   }
 
   return result.catch(() => {
     return worker.caches.open(CACHE_KEY).then((cache) => {
-      if (request.url.indexOf('&jsonp=') != -1) {
-        // https://script.google.com/exec?action=search&jsonp=cb123&params=
-        const cb = request.url.split('&jsonp=').pop().split('&')[0];
-        return fetch(new Request('data:text/javascript,' + cb + '([])'));
+      if (isJsonpRequest) {
+        return cache.match(JSONP_CACHE_KEY).then((response) => {
+          return response || getEmptyJsonpResponse_(request);
+        });
       }
       return cache.match('/offline/');
     });
@@ -183,4 +186,26 @@ const isRequiestCacheble_ = (request) => {
   const /** boolean */ hasNoCacheFlag = -1 != url.indexOf('nocache');
 
   return isGet && isSameOrigin && !hasNoCacheFlag;
+};
+
+
+/**
+ * @param {!Request} request The request to test.
+ * @return {boolean} Return true if request is JSONP request.
+ * @private
+ */
+const isJsonpRequest_ = (request) => {
+  return -1 != request.url.indexOf('&jsonp=');
+};
+
+
+/**
+ * @param {!Request} request The request to get calback function name.
+ * @return {!Promise} Return empty JSONP response.
+ * @private
+ */
+const getEmptyJsonpResponse_ = (request) => {
+  // https://script.google.com/exec?action=search&jsonp=cb123&params=
+  const cb = request.url.split('&jsonp=').pop().split('&')[0];
+  return fetch(new Request('data:text/javascript,' + cb + '([])'));
 };
