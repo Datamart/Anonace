@@ -46,7 +46,7 @@ worker.addEventListener('install', (event) => {
         cache.addAll(OFFLINE_CACHE.map((url) => {
           return new Request(url, {mode: 'no-cors'});
         }))
-        .catch((ex) => console.log('Could not pre-cache resource:', ex))
+        .catch((ex) => console.log('Could not pre-cache resource:', ex));
       })
       .catch((ex) => console.log('Could not pre-cache resources:', ex)));
 });
