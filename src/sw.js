@@ -17,19 +17,19 @@ const CACHE_KEY = 'CACHE_KEY';
  * @see https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Offline_Service_workers
  */
  const OFFLINE_CACHE = [
-  '/', '/index.html', '/favicon.ico', '/manifest.json',
+  '/', '/favicon.ico', '/manifest.json', '/robots.txt', '/sitemap.xml',
   // '/?utm_source=web_app_manifest',
-  '/terms-of-service/', '/privacy-policy/', '/disclaimer/', '/offline/',
-  '/images/feature-graphic-1024x500.jpg',
-  '/images/apple-touch-icon.png', '/images/logo.svg',
+  '/disclaimer/', '/offline/', '/privacy-policy/', 
+  '/technical-information/', '/terms-of-service/',
+
+  '/images/apple-touch-icon.png',
   '/images/favicon-32x32.png', '/images/favicon-16x16.png',
-  '/images/logo-144x144.png',
-  '/images/logo-192x192.png',
-  '/images/logo-256x256.png',
-  '/images/logo-384x384.png',
-  '/images/logo-512x512.png',
-  '/robots.txt', '/sitemap.xml',
-  'https://www.reddit.com/favicon.ico',
+  '/images/feature-graphic-1024x500.jpg',
+  '/images/logo-144x144.png', '/images/logo-192x192.png',
+  '/images/logo-256x256.png', '/images/logo-384x384.png',
+  '/images/logo-512x512.png', '/images/logo.svg',
+
+  // 'https://www.reddit.com/favicon.ico',
  ];
 
 /**
