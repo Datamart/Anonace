@@ -8,6 +8,7 @@
   "theme_color": "#222222",
   "background_color": "#ffffff",
   "lang": "en",
+  "categories": ["news", "social"],
   "icons": [
     {
       "src": "/images/logo-144x144.png",
