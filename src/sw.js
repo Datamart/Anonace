@@ -13,12 +13,39 @@
  */
 const CACHE_KEY = 'CACHE_KEY';
 
+/**
+ * @see https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Offline_Service_workers
+ */
+ const OFFLINE_CACHE = [
+  '/', '/index.html', '/favicon.ico', '/manifest.json',
+  '/?utm_source=web_app_manifest',
+  '/terms-of-service/', '/privacy-policy/', '/disclaimer/', '/offline/',
+  '/images/feature-graphic-1024x500.jpg',
+  '/images/apple-touch-icon.png', '/images/logo.svg',
+  '/images/favicon-32x32.png', '/images/favicon-16x16.png',
+  '/images/logo-144x144.png',
+  '/images/logo-192x192.png',
+  '/images/logo-256x256.png',
+  '/images/logo-384x384.png',
+  '/images/logo-512x512.png',
+  '/robots.txt', '/sitemap.xml',
+  'https://www.reddit.com/favicon.ico',
+ ];
 
 /**
  * Fixing Closure Compiler 'JSC_INEXISTENT_PROPERTY' warning.
  * @const {!ServiceWorkerGlobalScope}
  */
 const worker = /** @type {!ServiceWorkerGlobalScope} */ (self);
+
+
+worker.addEventListener('install', (event) => {
+  event.waitUntil(worker.caches.open(CACHE_KEY).then((cache) => {
+    cache.addAll(OFFLINE_CACHE.map((url) => {
+      return new Request(url, {mode: 'no-cors'});
+    }));
+  }));
+});
 
 
 worker.addEventListener('message', (event) => {
@@ -117,16 +144,18 @@ const initUpdateFoundListener_ = () => {
  * @private
  */
 const fetchAndCache_ = (request) => {
-  const /** !Promise */ result = fetch(request);
+  let /** !Promise */ result = fetch(request);
 
   if (isRequiestCacheble_(request)) {
-    return result.then(response => worker.caches.open(CACHE_KEY).then(cache => {
+    result = result.then((response) => worker.caches.open(CACHE_KEY).then(cache => {
       cache.put(request, response.clone());
       return response;
     }));
   }
 
-  return result;
+  return result.catch(() => {
+    return worker.caches.open(CACHE_KEY).then((cache) => cache.match('/offline/'));
+  });
 };
 
 
@@ -139,7 +168,7 @@ const isRequiestCacheble_ = (request) => {
   const /** string */ url = request.url;
   const /** boolean */ isGet = 'GET' == request.method;
   const /** boolean */ isSameOrigin = 0 == url.indexOf(worker.location.origin);
-  const /** boolean */ hasNoCacheFlag = 0 > url.indexOf('nocache');
+  const /** boolean */ hasNoCacheFlag = -1 != url.indexOf('nocache');
 
   return isGet && isSameOrigin && !hasNoCacheFlag;
 };
