@@ -162,8 +162,7 @@ const fetchAndCache_ = (request) => {
       if (request.url.indexOf('&jsonp=') != -1) {
         // https://script.google.com/exec?action=search&jsonp=cb123&params=
         const cb = request.url.split('&jsonp=').pop().split('&')[0];
-        console.log('sw:jsonp:cb:', cb);
-        return new Request('data:text/javascript,' + cb + '(null)');
+        return fetch(new Request('data:text/javascript,' + cb + '([])'));
       }
       return cache.match('/offline/');
     });
