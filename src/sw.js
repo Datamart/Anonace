@@ -18,7 +18,7 @@ const CACHE_KEY = 'CACHE_KEY';
  */
  const OFFLINE_CACHE = [
   '/', '/favicon.ico', '/manifest.json', '/robots.txt', '/sitemap.xml',
-  // '/?utm_source=web_app_manifest',
+  '/?utm_source=web_app_manifest',
   '/disclaimer/', '/offline/', '/privacy-policy/', 
   '/technical-information/', '/terms-of-service/',
 
@@ -162,9 +162,10 @@ const fetchAndCache_ = (request) => {
       if (request.url.indexOf('&jsonp=') != -1) {
         // https://script.google.com/exec?action=search&jsonp=cb123&params=
         const cb = request.url.split('&jsonp=').pop().split('&')[0];
+        console.log('sw:jsonp:cb:', cb);
         return new Request('data:text/javascript,' + cb + '(null)');
       }
-      cache.match('/offline/');
+      return cache.match('/offline/');
     });
   });
 };
