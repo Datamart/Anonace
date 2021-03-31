@@ -18,7 +18,7 @@ const CACHE_KEY = 'CACHE_KEY';
  */
  const OFFLINE_CACHE = [
   '/', '/index.html', '/favicon.ico', '/manifest.json',
-  '/?utm_source=web_app_manifest',
+  // '/?utm_source=web_app_manifest',
   '/terms-of-service/', '/privacy-policy/', '/disclaimer/', '/offline/',
   '/images/feature-graphic-1024x500.jpg',
   '/images/apple-touch-icon.png', '/images/logo.svg',
@@ -40,11 +40,16 @@ const worker = /** @type {!ServiceWorkerGlobalScope} */ (self);
 
 
 worker.addEventListener('install', (event) => {
-  event.waitUntil(worker.caches.open(CACHE_KEY).then((cache) => {
-    cache.addAll(OFFLINE_CACHE.map((url) => {
-      return new Request(url, {mode: 'no-cors'});
-    }));
-  }));
+  event.waitUntil(
+    worker.caches.open(CACHE_KEY)
+      .then((cache) => {
+        cache.addAll(OFFLINE_CACHE.map((url) => {
+          return new Request(url, {mode: 'no-cors'});
+        }));
+      })
+      .catch((ex) => {
+        console.log('Could not pre-cache resources:', ex);
+      }));
 });
 
 
@@ -154,7 +159,14 @@ const fetchAndCache_ = (request) => {
   }
 
   return result.catch(() => {
-    return worker.caches.open(CACHE_KEY).then((cache) => cache.match('/offline/'));
+    return worker.caches.open(CACHE_KEY).then((cache) => {
+      if (request.url.indexOf('&jsonp=') != -1) {
+        // https://script.google.com/exec?action=search&jsonp=cb123&params=
+        const cb = request.url.split('&jsonp=').pop().split('&')[0];
+        return new Request('data:text/javascript,' + cb + '(null)');
+      }
+      cache.match('/offline/');
+    });
   });
 };
 
