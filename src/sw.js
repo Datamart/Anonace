@@ -27,6 +27,7 @@ const CACHE_KEY = 'CACHE_KEY';
   '/images/feature-graphic-1024x500.jpg',
   '/images/logo-144x144.png', '/images/logo-192x192.png',
   '/images/logo-256x256.png', '/images/logo-384x384.png',
+  '/images/logo-512x512-maskable.png',
   '/images/logo-512x512.png', '/images/logo.svg',
 
   // 'https://www.reddit.com/favicon.ico',
