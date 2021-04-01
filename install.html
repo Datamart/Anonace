@@ -49,51 +49,35 @@
 <link rel="shortcut icon" href="./favicon.ico">
 <link rel="mask-icon" href="./images/logo.svg" sizes="any" color="#444444">
 <style>
-#pwa-install {display: none; cursor: pointer; color: blue; text-decoration: underline;}
+html,body,#pwa-install{height:100%}
+#pwa-install{align-items:center;display:none;justify-content:center}
+#pwa-install span{color:blue;cursor:pointer;text-decoration:underline}
 </style>
 </head>
 <body>
 <div id="pwa-install"><span>Install App</span></div>
-<textarea id="txt-log"></textarea>
 <script>
 let deferredPrompt;
 const log = (msg) => document.getElementById('txt-log').value += msg + '\r\n';
 const buttonInstall = document.getElementById('pwa-install');
-const showInstallPromotion = () => buttonInstall.style.display = 'block';
+const showInstallPromotion = () => buttonInstall.style.display = 'flex';
 const hideInstallPromotion = () => buttonInstall.style.display = 'none';
 
 window.addEventListener('beforeinstallprompt', (e) => {
-  // Prevent the mini-infobar from appearing on mobile
   e.preventDefault();
-  // Stash the event so it can be triggered later.
   deferredPrompt = e;
-  // Update UI notify the user they can install the PWA
   showInstallPromotion();
-  // Optionally, send analytics event that PWA install promo was shown.
-  log('beforeinstallprompt event was fired.');
 });
 
 buttonInstall.addEventListener('click', async () => {
-  // Hide the app provided install promotion
   hideInstallPromotion();
-  // Show the install prompt
   deferredPrompt.prompt();
-  // Wait for the user to respond to the prompt
-  const { outcome } = await deferredPrompt.userChoice;
-  // Optionally, send analytics event with outcome of user choice
-  log(`User response to the install prompt: ${outcome}`);
-  // We've used the prompt, and can't use it again, throw it away
   deferredPrompt = null;
 });
 
 window.addEventListener('appinstalled', () => {
-  // Hide the app-provided install promotion
   hideInstallPromotion();
-  // Clear the deferredPrompt so it can be garbage collected
   deferredPrompt = null;
-  // Optionally, send analytics event to indicate successful install
-  log('PWA was installed');
-  log('PWA display mode: ' + getPWADisplayMode());
 });
 
 function getPWADisplayMode() {
@@ -108,9 +92,4 @@ function getPWADisplayMode() {
 
 navigator.serviceWorker.register('/sw.js');
 </script>
-<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
-  <meta itemprop="ratingValue" content="5">
-  <meta itemprop="reviewCount" content="18">
-  <meta itemprop="sameAs" content="https://play.google.com/store/apps/details?id=com.anonace.android">
-</div>
 </body></html>
