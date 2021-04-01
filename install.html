@@ -83,12 +83,16 @@ const isIOS = (/iPad|iPhone|iPod/.test(navigator.platform) ||
                navigator.maxTouchPoints > 1)) && !window.MSStream;
 
 const init = () => {
-  if (isIOS) {
-    document.getElementById('ios-message').style.display = 'flex';
-  } else if (!window.BeforeInstallPromptEvent) {
-    document.getElementById('not-supported').style.display = 'flex';
+  if ('browser' == getPWADisplayMode()) {
+    if (isIOS) {
+      document.getElementById('ios-message').style.display = 'flex';
+    } else if (!window.BeforeInstallPromptEvent) {
+      document.getElementById('not-supported').style.display = 'flex';
+    } else {
+      navigator.serviceWorker.register('/sw.js');
+    }
   } else {
-    navigator.serviceWorker.register('/sw.js');
+    location.replace('/');
   }
 };
 
