@@ -49,23 +49,46 @@
 <link rel="shortcut icon" href="./favicon.ico">
 <link rel="mask-icon" href="./images/logo.svg" sizes="any" color="#444444">
 <style>
-html,body,#pwa-install,#not-supported{height:100%;margin:0;padding:0}
-#pwa-install,#not-supported{align-items:center;display:none;justify-content:center}
+html,body,#pwa-install,#not-supported,#ios-message{height:100%;margin:0;padding:0}
+#pwa-install,#not-supported,#ios-message{align-items:center;display:none;justify-content:center}
 #pwa-install span{color:blue;cursor:pointer;text-decoration:underline}
 </style>
 </head>
 <body>
 <div id="pwa-install"><span>Install App</span></div>
 <div id="not-supported">PWA installation is not supported.</div>
+<div id="ios-message">
+  <ol>
+    <li>
+      Click share button
+      <img height="22" alt="Share Button Image" src="data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMiIgZGF0YS1uYW1lPSJMYXllciAyIiB4bWxucz0iaHR0cDovL3d3dy5 3My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMC44OCAyNy4yNSI+PGRlZnM+PHN0eWxlPi 5jbHMtMXtmaWxsOm5vbmU7c3Ryb2tlOiMyMzFmMjA7fTwvc3R5bGU+PC9kZWZzPjx0aXRsZT5TY WZhcmlfU2hhcmU8L3RpdGxlPjxwb2x5bGluZSBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMTMuMTMg OCAyMC4zOCA4IDIwLjM4IDI2Ljc1IDAuNSAyNi43NSAwLjUgOCA3LjUgOCIvPjxsaW5lIGNsYXN zPSJjbHMtMSIgeDE9IjEwLjQ0IiB5MT0iMTciIHgyPSIxMC40NCIvPjxsaW5lIGNsYXNzPSJjbH MtMSIgeDE9IjEwLjQ4IiB5MT0iMC4zOCIgeDI9IjE1LjI4IiB5Mj0iNS4xOCIvPjxsaW5lIGNsY XNzPSJjbHMtMSIgeDE9IjEwLjQ0IiB5MT0iMC4zOCIgeDI9IjUuNjQiIHkyPSI1LjE4Ii8+PC9z dmc+"> 
+      at the (top or bottom) of the browser.
+    </li>
+    <li>Then scroll (if needed) to find the "Add to Home Screen" button
+      <img height="22" alt="Add to Home Screen button Image" src="data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMiIgZGF0YS1uYW1lPSJMYXllciAyIiB4bWxucz0iaHR0cDovL3d3dy5 3My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNSAzNSI+PHRpdGxlPlNhZmFyaV9BMkhTPC 90aXRsZT48cmVjdCB3aWR0aD0iMzUiIGhlaWdodD0iMzUiIHJ4PSI4IiByeT0iOCIgc3R5bGU9I mZpbGw6IzhmOGY4ZiIvPjxsaW5lIHgxPSIyNC43NSIgeTE9IjE3LjUiIHgyPSIxMC4yNSIgeTI9 IjE3LjUiIHN0eWxlPSJmaWxsOm5vbmU7c3Ryb2tlOiNmZmY7c3Ryb2tlLXdpZHRoOjJweCIvPjx saW5lIHgxPSIxNy41IiB5MT0iMTAuMjUiIHgyPSIxNy41IiB5Mj0iMjQuNzUiIHN0eWxlPSJmaW xsOm5vbmU7c3Ryb2tlOiNmZmY7c3Ryb2tlLXdpZHRoOjJweCIvPjwvc3ZnPg==">
+    </li>
+    <li>Choose a name for the homescreen icon.</li>
+  </ol>
+</div>
 <script>
 let deferredPrompt;
 const log = (msg) => document.getElementById('txt-log').value += msg + '\r\n';
 const buttonInstall = document.getElementById('pwa-install');
 const showInstallPromotion = () => buttonInstall.style.display = 'flex';
 const hideInstallPromotion = () => buttonInstall.style.display = 'none';
+const isIOS = (/iPad|iPhone|iPod/.test(navigator.platform) ||
+              (navigator.platform === 'MacIntel' && 
+               navigator.maxTouchPoints > 1)) && !window.MSStream;
 
-if (!window.BeforeInstallPromptEvent)
-  document.getElementById('not-supported').style.display = 'flex';
+const init = () => {
+  if (isIOS) {
+    document.getElementById('ios-message').style.display = 'flex';
+  } else if (!window.BeforeInstallPromptEvent) {
+    document.getElementById('not-supported').style.display = 'flex';
+  } else {
+    navigator.serviceWorker.register('/sw.js');
+  }
+};
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
@@ -94,6 +117,6 @@ function getPWADisplayMode() {
   return 'browser';
 }
 
-navigator.serviceWorker.register('/sw.js');
+init();
 </script>
 </body></html>
