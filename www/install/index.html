@@ -54,7 +54,7 @@ html,body,#pwa-install,#not-supported,#ios-message{height:100%;margin:0;padding:
 #pwa-install span{color:blue;cursor:pointer;text-decoration:underline}
 img{vertical-align:middle}
 li{line-height:2em}
-#txt-log{bottom:0;box-sizing:border-box;display:none;height:4em;position:fixed;resize:none;width:100%}
+#txt-log{bottom:0;box-sizing:border-box;display:none;height:8em;position:fixed;resize:none;width:100%}
 </style>
 </head>
 <body>
@@ -130,7 +130,7 @@ const getDisplayMode = () => {
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
-  log('Available platforms: ' + e.platforms);
+  log('Available platforms: ' + e.platforms.join(', '));
   deferredPrompt = e;
   showInstallPromotion();
 });
