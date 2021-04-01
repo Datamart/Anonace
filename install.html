@@ -69,7 +69,7 @@ li{line-height:2em}
     <li>Then scroll (if needed) to find the "Add to Home Screen" button
       <img height="22" alt="Add to Home Screen button Image" src="data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMiIgZGF0YS1uYW1lPSJMYXllciAyIiB4bWxucz0iaHR0cDovL3d3dy5 3My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNSAzNSI+PHRpdGxlPlNhZmFyaV9BMkhTPC 90aXRsZT48cmVjdCB3aWR0aD0iMzUiIGhlaWdodD0iMzUiIHJ4PSI4IiByeT0iOCIgc3R5bGU9I mZpbGw6IzhmOGY4ZiIvPjxsaW5lIHgxPSIyNC43NSIgeTE9IjE3LjUiIHgyPSIxMC4yNSIgeTI9 IjE3LjUiIHN0eWxlPSJmaWxsOm5vbmU7c3Ryb2tlOiNmZmY7c3Ryb2tlLXdpZHRoOjJweCIvPjx saW5lIHgxPSIxNy41IiB5MT0iMTAuMjUiIHgyPSIxNy41IiB5Mj0iMjQuNzUiIHN0eWxlPSJmaW xsOm5vbmU7c3Ryb2tlOiNmZmY7c3Ryb2tlLXdpZHRoOjJweCIvPjwvc3ZnPg==">
     </li>
-    <li>Choose a name for the homescreen icon.</li>
+    <li>Choose a name for the home screen icon.</li>
   </ol>
 </div>
 <script>
@@ -83,7 +83,7 @@ const isIOS = (/iPad|iPhone|iPod/.test(navigator.platform) ||
                navigator.maxTouchPoints > 1)) && !window.MSStream;
 
 const init = () => {
-  if ('browser' == getPWADisplayMode()) {
+  if ('browser' == getDisplayMode()) {
     if (isIOS) {
       document.getElementById('ios-message').style.display = 'flex';
     } else if (!window.BeforeInstallPromptEvent) {
@@ -94,6 +94,16 @@ const init = () => {
   } else {
     location.replace('/');
   }
+};
+
+const getDisplayMode = () => {
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  if (document.referrer.startsWith('android-app://')) {
+    return 'twa';
+  } else if (navigator.standalone || isStandalone) {
+    return 'standalone';
+  }
+  return 'browser';
 };
 
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -112,16 +122,6 @@ window.addEventListener('appinstalled', () => {
   hideInstallPromotion();
   deferredPrompt = null;
 });
-
-function getPWADisplayMode() {
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-  if (document.referrer.startsWith('android-app://')) {
-    return 'twa';
-  } else if (navigator.standalone || isStandalone) {
-    return 'standalone';
-  }
-  return 'browser';
-}
 
 init();
 </script>
