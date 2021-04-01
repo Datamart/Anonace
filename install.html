@@ -50,18 +50,22 @@
 <link rel="mask-icon" href="./images/logo.svg" sizes="any" color="#444444">
 <style>
 html,body,#pwa-install{height:100%;margin:0;padding:0}
-#pwa-install{align-items:center;display:none;justify-content:center}
+#pwa-install,#not-supported{align-items:center;display:none;justify-content:center}
 #pwa-install span{color:blue;cursor:pointer;text-decoration:underline}
 </style>
 </head>
 <body>
 <div id="pwa-install"><span>Install App</span></div>
+<div id="not-supported">PWA installation is not supported.</div>
 <script>
 let deferredPrompt;
 const log = (msg) => document.getElementById('txt-log').value += msg + '\r\n';
 const buttonInstall = document.getElementById('pwa-install');
 const showInstallPromotion = () => buttonInstall.style.display = 'flex';
 const hideInstallPromotion = () => buttonInstall.style.display = 'none';
+
+if (!window.BeforeInstallPromptEvent)
+  document.getElementById('not-supported').style.display = 'flex';
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
