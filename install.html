@@ -54,6 +54,7 @@ html,body,#pwa-install,#not-supported,#ios-message{height:100%;margin:0;padding:
 #pwa-install span{color:blue;cursor:pointer;text-decoration:underline}
 img{vertical-align:middle}
 li{line-height:2em}
+#txt-log{bottom:0;box-sizing:border-box;display:none;height:4em;position:fixed;resize:none;width:100%}
 </style>
 </head>
 <body>
@@ -72,6 +73,7 @@ li{line-height:2em}
     <li>Choose a name for the home screen icon.</li>
   </ol>
 </div>
+<textarea id="txt-log" readonly></textarea>
 <script>
 let deferredPrompt;
 const log = (msg) => document.getElementById('txt-log').value += msg + '\r\n';
@@ -83,13 +85,20 @@ const isIOS = (/iPad|iPhone|iPod/.test(navigator.platform) ||
                navigator.maxTouchPoints > 1)) && !window.MSStream;
 
 const init = () => {
-  if ('browser' == getDisplayMode()) {
+  if (-1 < location.search.indexOf('log')) 
+    document.getElementById('txt-log').style.display = 'block';
+
+  const mode = getDisplayMode();
+  log('Display mode: ' + mode);
+  if ('browser' == mode) {
     if (isIOS) {
       document.getElementById('ios-message').style.display = 'flex';
-    } else if (!window.BeforeInstallPromptEvent) {
-      document.getElementById('not-supported').style.display = 'flex';
+    } else if (window.BeforeInstallPromptEvent) {
+      navigator.serviceWorker.register('/sw.js')
+        .then((ev) => log('Service worker registered successfully: ' + ev))
+        .catch((ex) => log('Could not register service worker: ' + ex));
     } else {
-      navigator.serviceWorker.register('/sw.js');
+      document.getElementById('not-supported').style.display = 'flex';
     }
   } else {
     location.replace('/');
@@ -119,6 +128,7 @@ buttonInstall.addEventListener('click', async () => {
 });
 
 window.addEventListener('appinstalled', () => {
+  log('The application has been successfully installed.');
   hideInstallPromotion();
   deferredPrompt = null;
 });
