@@ -37,6 +37,7 @@
     }
   ],
   "related_applications": [
+    { "platform": "webapp", "url": "https://anonace.com/manifest.json" },
     { "platform": "web", "url": "https://anonace.com/" },
     { "platform": "play", "url": "https://play.google.com/store/apps/details?id=com.anonace.android", "id": "com.anonace.android" },
     { "platform": "itunes", "url": "https://itunes.apple.com/app/anonace/id1452074587" }
