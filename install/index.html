@@ -95,7 +95,13 @@ const init = () => {
       document.getElementById('ios-message').style.display = 'flex';
     } else if (window.BeforeInstallPromptEvent) {
       navigator.serviceWorker.register('/sw.js')
-        .then((ev) => log('Service worker registered successfully: ' + ev))
+        .then((reg) => {
+          log('Service worker registered successfully.');
+          const status = reg.installing ? 
+            'Installing' : reg.waiting ? 
+            'Installed' : reg.active ? 'Active' : 'Not Installed';
+          log('Service worker status: ' + status);
+        })
         .catch((ex) => log('Could not register service worker: ' + ex));
     } else {
       document.getElementById('not-supported').style.display = 'flex';
@@ -124,6 +130,7 @@ const getDisplayMode = () => {
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
+  log('Available platforms: ' + e.platforms);
   deferredPrompt = e;
   showInstallPromotion();
 });
