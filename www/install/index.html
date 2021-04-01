@@ -49,8 +49,8 @@
 <link rel="shortcut icon" href="../favicon.ico">
 <link rel="mask-icon" href="../images/logo.svg" sizes="any" color="#444444">
 <style>
-html,body,#pwa-install,#not-supported,#ios-message{height:100%;margin:0;padding:0}
-#pwa-install,#not-supported,#ios-message{align-items:center;display:none;justify-content:center}
+html,body,#pwa-installed,#pwa-install,#not-supported,#ios-message{height:100%;margin:0;padding:0}
+#pwa-installed,#pwa-install,#not-supported,#ios-message{align-items:center;display:none;justify-content:center}
 #pwa-install span{color:blue;cursor:pointer;text-decoration:underline}
 img{vertical-align:middle}
 li{line-height:2em}
@@ -58,6 +58,7 @@ li{line-height:2em}
 </style>
 </head>
 <body>
+<div id="pwa-installed">The application is already installed.</div>
 <div id="pwa-install"><span>Install App</span></div>
 <div id="not-supported">PWA installation is not supported.</div>
 <div id="ios-message">
@@ -77,9 +78,9 @@ li{line-height:2em}
 <script>
 let deferredPrompt;
 const log = (msg) => document.getElementById('txt-log').value += msg + '\r\n';
-const buttonInstall = document.getElementById('pwa-install');
-const showInstallPromotion = () => buttonInstall.style.display = 'flex';
-const hideInstallPromotion = () => buttonInstall.style.display = 'none';
+const btn = document.getElementById('pwa-install');
+const show = (nodeId) => document.getElementById(nodeId).style.display = 'flex';
+const hide = (nodeId) => document.getElementById(nodeId).style.display = 'none';
 const isIOS = (/iPad|iPhone|iPod/.test(navigator.platform) ||
               (navigator.platform === 'MacIntel' && 
                navigator.maxTouchPoints > 1)) && !window.MSStream;
@@ -92,7 +93,7 @@ const init = () => {
   log('Display mode: ' + mode);
   if ('browser' == mode) {
     if (isIOS) {
-      document.getElementById('ios-message').style.display = 'flex';
+      show('ios-message');
     } else if (window.BeforeInstallPromptEvent) {
       navigator.serviceWorker.register('/sw.js')
         .then((reg) => {
@@ -104,7 +105,7 @@ const init = () => {
         })
         .catch((ex) => log('Could not register service worker: ' + ex));
     } else {
-      document.getElementById('not-supported').style.display = 'flex';
+      show('not-supported');
     }
   } else {
     location.replace('/');
@@ -113,7 +114,10 @@ const init = () => {
   if (navigator.getInstalledRelatedApps) {
     navigator.getInstalledRelatedApps().then((apps) => {
       log('Installed related apps: ' + apps.length);
-      apps.forEach((app) => log([app.id, app.platform, app.url].join(' ')));
+      apps.forEach((app) => {
+        log([app.id, app.platform, app.url, app.version].join(' '));
+        'webapp' == app.platform && show('pwa-installed');
+      });
     })
   }
 };
@@ -128,22 +132,25 @@ const getDisplayMode = () => {
   return 'browser';
 };
 
+btn.addEventListener('click', () => {
+  hide('pwa-install');
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then((choice) => {
+    log('User choice is "' + choice.outcome + '".');
+    deferredPrompt = null;
+  });
+});
+
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   log('Available platforms: ' + e.platforms.join(', '));
   deferredPrompt = e;
-  showInstallPromotion();
-});
-
-buttonInstall.addEventListener('click', async () => {
-  hideInstallPromotion();
-  deferredPrompt.prompt();
-  deferredPrompt = null;
+  show('pwa-install');
 });
 
 window.addEventListener('appinstalled', () => {
   log('The application has been successfully installed.');
-  hideInstallPromotion();
+  hide('pwa-install');
   deferredPrompt = null;
 });
 
