@@ -49,22 +49,22 @@
 <link rel="shortcut icon" href="../favicon.ico">
 <link rel="mask-icon" href="../images/logo.svg" sizes="any" color="#444444">
 <style>
-html,body,#pwa-installed,#pwa-install,#not-supported,#ios-message{
-  font-family:"Lucida Grande",arial,sans-serif;font-size:100%;
+html,body,#pwa-installed,#pwa-install,#pwa-not-supported,#pwa-ios-message{
+  font-family:Roboto,"Lucida Grande",arial,sans-serif;font-size:100%;
   height:100%;margin:0;padding:0;
 }
-#pwa-installed,#pwa-install,#not-supported,#ios-message{align-items:center;display:none;justify-content:center}
+#pwa-installed,#pwa-install,#pwa-not-supported,#pwa-ios-message{align-items:center;display:none;justify-content:center}
 #pwa-install span{color:blue;cursor:pointer;text-decoration:underline}
 img{vertical-align:middle}
 li{line-height:2em}
-#txt-log{bottom:0;box-sizing:border-box;display:none;height:8em;position:fixed;resize:none;width:100%}
+#pwa-logger{bottom:0;box-sizing:border-box;display:none;height:8em;position:fixed;resize:none;width:100%}
 </style>
 </head>
 <body>
 <div id="pwa-installed">The application is already installed.</div>
 <div id="pwa-install"><span>Install App</span></div>
-<div id="not-supported">PWA installation is not supported.</div>
-<div id="ios-message">
+<div id="pwa-not-supported">PWA installation is not supported.</div>
+<div id="pwa-ios-message">
   <ol>
     <li>
       Click share button
@@ -77,10 +77,11 @@ li{line-height:2em}
     <li>Choose a name for the home screen icon.</li>
   </ol>
 </div>
-<textarea id="txt-log" readonly></textarea>
+<textarea id="pwa-logger" readonly></textarea>
 <script>
 let deferredPrompt;
-const log = (msg) => document.getElementById('txt-log').value += msg + '\r\n';
+const logger = document.getElementById('pwa-logger');
+const log = (msg) => {if (logger) logger.value += msg + '\r\n'};
 const btn = document.getElementById('pwa-install');
 const show = (nodeId) => document.getElementById(nodeId).style.display = 'flex';
 const hide = (nodeId) => document.getElementById(nodeId).style.display = 'none';
@@ -89,14 +90,14 @@ const isIOS = (/iPad|iPhone|iPod/.test(navigator.platform) ||
                navigator.maxTouchPoints > 1)) && !window.MSStream;
 
 const init = () => {
-  if (-1 < location.search.indexOf('log')) 
-    document.getElementById('txt-log').style.display = 'block';
+  if (-1 < location.search.indexOf('log') && logger) 
+    logger.style.display = 'block';
 
   const mode = getDisplayMode();
   log('Display mode: ' + mode);
   if ('browser' == mode) {
     if (isIOS) {
-      show('ios-message');
+      show('pwa-ios-message');
     } else if (window.BeforeInstallPromptEvent) {
       navigator.serviceWorker.register('/sw.js')
         .then((reg) => {
@@ -108,7 +109,7 @@ const init = () => {
         })
         .catch((ex) => log('Could not register service worker: ' + ex));
     } else {
-      show('not-supported');
+      show('pwa-not-supported');
     }
   } else {
     location.replace('/');
