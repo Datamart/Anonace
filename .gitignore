@@ -7,6 +7,6 @@
 bin/lib
 src/bundle.js
 src/bundle.css
-www/technical-information/
+www/technical-information/index.html
 www/index.html
 www/sw.js
