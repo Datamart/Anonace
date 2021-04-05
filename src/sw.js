@@ -262,24 +262,28 @@ const openApp_ = () => {
   const clients = worker.clients;
   postMessage_({log:'openApp: called'});
 
-  return clients.matchAll().then((list) => {
-    for (let i = 0; i < list.length; ++i) {
-      const client = list[i];
-      if (client.url == url && 'focus' in client) {
-        postMessage_({log:'openApp: found client'});
-        client.focus();
-        return client;
+  return clients.matchAll()
+    .then((list) => {
+      for (let i = 0; i < list.length; ++i) {
+        const client = list[i];
+        if (client.url == url && 'focus' in client) {
+          postMessage_({log:'openApp: found client'});
+          client.focus();
+          return client;
+        }
       }
-    }
 
-    if (clients.openWindow) {
-      postMessage_({log:'openApp: opening app'});
-      return clients.openWindow(url).then((win) => {
-        postMessage_({log:'openApp: opened app'});
-        return win;
-      });
-    }
-  });
+      if (clients.openWindow) {
+        postMessage_({log:'openApp: opening app'});
+        return clients.openWindow(url)
+          .then((win) => {
+            postMessage_({log:'openApp: opened app'});
+            return win;
+          })
+          .catch((ex) => postMessage_({'type':'openWindow', ex}));
+      }
+    })
+    .catch((ex) => postMessage_({'type': 'matchAll', ex}));
 };
 
 
