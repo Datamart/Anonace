@@ -61,10 +61,7 @@ li{line-height:2em}
 </style>
 </head>
 <body>
-<div id="pwa-installed">
-  The application is already installed.<br>
-  <a href="javascript:openApp();">Open App</a>
-</div>
+<div id="pwa-installed">The application is already installed.</div>
 <div id="pwa-install"><span>Install App</span></div>
 <div id="pwa-not-supported">PWA installation is not supported.</div>
 <div id="pwa-ios-message">
@@ -152,16 +149,6 @@ const getDisplayMode = () => {
     return 'standalone';
   }
   return 'browser';
-};
-
-const openApp = () => {
-  log('Calling openApp.')
-  const worker = navigator.serviceWorker;
-  if (worker) {
-    worker.addEventListener('message', (event) => log(JSON.stringify(event)));
-    log('Worker controller: ' + typeof worker.controller);
-    worker.controller && worker.controller.postMessage({action: 'openApp'});
-  }
 };
 
 btn.addEventListener('click', () => {
