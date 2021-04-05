@@ -49,12 +49,12 @@
 <link rel="shortcut icon" href="../favicon.ico">
 <link rel="mask-icon" href="../images/logo.svg" sizes="any" color="#444444">
 <style>
-html,body,#pwa-installed,#pwa-install,#pwa-not-supported,#pwa-ios-message{
+html,body,#pwa-installed,#pwa-install,#pwa-not-supported,#pwa-ios-message,#sw-update{
   font-family:Roboto,"Lucida Grande",arial,sans-serif;font-size:100%;
   height:100%;margin:0;padding:0;
 }
-#pwa-installed,#pwa-install,#pwa-not-supported,#pwa-ios-message{align-items:center;display:none;justify-content:center}
-#pwa-install span{color:blue;cursor:pointer;text-decoration:underline}
+#pwa-installed,#pwa-install,#pwa-not-supported,#pwa-ios-message,#sw-update{align-items:center;display:none;justify-content:center}
+#pwa-install span,#sw-update{color:blue;cursor:pointer;text-decoration:underline}
 img{vertical-align:middle}
 li{line-height:2em}
 #pwa-logger{bottom:0;box-sizing:border-box;display:none;height:8em;position:fixed;resize:none;width:100%}
@@ -80,6 +80,7 @@ li{line-height:2em}
     <li>Choose a name for the home screen icon.</li>
   </ol>
 </div>
+<div id="sw-update">Update service worker</div>
 <textarea id="pwa-logger" readonly></textarea>
 <script>
 let deferredPrompt;
@@ -93,8 +94,10 @@ const isIOS = (/iPad|iPhone|iPod/.test(navigator.platform) ||
                navigator.maxTouchPoints > 1)) && !window.MSStream;
 
 const init = () => {
-  if (-1 < location.search.indexOf('log') && logger) 
+  if (-1 < location.search.indexOf('log') && logger) {
     logger.style.display = 'block';
+    show('sw-update');
+  }
 
   const mode = getDisplayMode();
   log('Display mode: ' + mode);
@@ -109,6 +112,18 @@ const init = () => {
             'Installing' : reg.waiting ? 
             'Installed' : reg.active ? 'Active' : 'Not Installed';
           log('Service worker status: ' + status);
+
+          document.getElementById('sw-update').onclick = () => {
+            reg.update()
+              .then((newReg) => {
+                log('Service worker updsted successfully.');
+                const status = newReg.installing ? 
+                  'Installing' : newReg.waiting ? 
+                  'Installed' : newReg.active ? 'Active' : 'Not Installed';
+                log('New service worker status: ' + status);
+              })
+              .catch((ex) => log('Could not update service worker: ' + ex));
+          };
         })
         .catch((ex) => log('Could not register service worker: ' + ex));
     } else {
