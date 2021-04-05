@@ -143,6 +143,7 @@ const openApp = () => {
   const worker = navigator.serviceWorker;
   if (worker) {
     worker.addEventListener('message', (event) => log(JSON.stringify(event)));
+    log('Worker controller: ' + typeof worker.controller);
     worker.controller && worker.controller.postMessage({action: 'openApp'});
   }
 };
