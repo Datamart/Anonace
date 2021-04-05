@@ -107,7 +107,7 @@ worker.addEventListener('activate', (event) => {
  * @private
  */
 const postMessage_ = (message) => {
-  worker.clients.matchAll().then(clients => clients.forEach(client => {
+  worker.clients.matchAll().then((clients) => clients.forEach((client) => {
     client.postMessage(message);
   }));
 };
@@ -118,7 +118,7 @@ const postMessage_ = (message) => {
  * @private
  */
 const clearCache_ = () => {
-  return worker.caches.keys().then(keys => Promise.all(keys.map(key => {
+  return worker.caches.keys().then((keys) => Promise.all(keys.map((key) => {
     if (key !== CACHE_KEY) {
       return worker.caches.delete(key);
     }
