@@ -260,18 +260,24 @@ const getJsonpCacheKey_ = (request) => {
 const openApp_ = () => {
   const url = '/';
   const clients = worker.clients;
+  postMessage_({log:'openApp: called'});
 
-  return clients.matchAll({type: 'window'}).then((list) => {
+  return clients.matchAll().then((list) => {
     for (let i = 0; i < list.length; ++i) {
       const client = list[i];
       if (client.url == url && 'focus' in client) {
+        postMessage_({log:'openApp: found client'});
         client.focus();
         return client;
       }
     }
 
     if (clients.openWindow) {
-      return clients.openWindow(url).then((win) => win);
+      postMessage_({log:'openApp: opening app'});
+      return clients.openWindow(url).then((win) => {
+        postMessage_({log:'openApp: opened app'});
+        return win;
+      });
     }
   });
 };
