@@ -140,6 +140,7 @@ const getDisplayMode = () => {
 };
 
 const openApp = () => {
+  log('Calling openApp.')
   const worker = navigator.serviceWorker;
   if (worker) {
     worker.addEventListener('message', (event) => log(JSON.stringify(event)));
