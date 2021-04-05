@@ -62,6 +62,11 @@ worker.addEventListener('message', (event) => {
   } else if ('skipWaiting' == action) {
     // @see initUpdateFoundListener_
     worker.skipWaiting();
+  } else if ('openApp' == action) {
+    openApp_().then((win) => {
+      response['win'] = win;
+      postMessage_(response);
+    });
   }
 
   postMessage_(response);
@@ -247,6 +252,28 @@ const getJsonpCacheKey_ = (request) => {
   const keys = [map['action'], hash(map['query'])];
   map['source'] && keys.push(map['source']);
   return 'offline' + keys.join('-') + '.json';
+};
+
+/**
+ * @return {!Promise}
+ */
+const openApp_ = () => {
+  const url = '/';
+  const clients = worker.clients;
+
+  return clients.matchAll({type: 'window'}).then((list) => {
+    for (let i = 0; i < list.length; ++i) {
+      const client = list[i];
+      if (client.url == url && 'focus' in client) {
+        client.focus();
+        return client;
+      }
+    }
+
+    if (clients.openWindow) {
+      return clients.openWindow(url).then((win) => win);
+    }
+  });
 };
 
 

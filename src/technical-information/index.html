@@ -42,9 +42,18 @@
     const isPortrait = window.innerHeight > window.innerWidth;
     let orientationType = isPortrait ? 'Portrait' : 'Landscape';
     let orientationAngle = isPortrait ? 0 : 90;
-    const isStandalone = navigator.standalone ||
-                         window.matchMedia('(display-mode: standalone)').matches ||
-                         0 < navigator.userAgent.toLowerCase().indexOf('anonace');
+
+    const getDisplayMode = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isCustomAgent = 0 < navigator.userAgent.toLowerCase().indexOf('anonace');
+      if (document.referrer.startsWith('android-app://')) {
+        return 'twa';
+      } else if (navigator.standalone || isStandalone || isCustomAgent) {
+        return 'standalone';
+      }
+      return 'browser';
+    };
+
     const worker = navigator.serviceWorker;
     let isReloading;
 
@@ -121,8 +130,8 @@
         <tr><td>Version:</td><td>@APP_VERSION (@BUILD_DATE)</td></tr>
         <tr><td>Domain:</td>
           <td><script>setContent(document.domain || location.hostname || 'dev')</script></td></tr>
-        <tr><td>Standalone:</td>
-          <td><script>setContent(isStandalone)</script></td></tr>
+        <tr><td>Display Mode:</td>
+          <td><script>setContent(getDisplayMode())</script></td></tr>
         <tr><th colspan="2" align="left">Device</th></tr>
         <tr><td>Platform:</td>
           <td><script>setContent(navigator.platform)</script></td></tr>
