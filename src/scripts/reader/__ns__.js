@@ -384,6 +384,19 @@ reader.App = function() {
     }
   };
 
+  /**
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/NavigatorOnLine/Online_and_offline_events
+  */
+  const initNetworkStatus_ = () => {
+    const handler = () => {
+      const fn = (dom.device.onLine ? dom.css.removeClass : dom.css.addClass);
+      fn(dom.document.body, 'offline');
+    };
+    dom.events.addEventListener(dom.context, 'online', handler);
+    dom.events.addEventListener(dom.context, 'offline', handler);
+    handler();
+  };
+
   const init_ = () => {
     initPlatform_();
     initDarkMode_();
@@ -393,6 +406,7 @@ reader.App = function() {
     initSourcesList_();
     initUserConfig_();
     initContent_();
+    initNetworkStatus_();
     dom.css.removeClass(dom.document.body, 'no-js');
 
     // document.referrer.indexOf('android-app://') == 0 // Android TWA

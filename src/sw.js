@@ -21,7 +21,6 @@ const CACHE_KEY = 'CACHE_KEY';
   '/?utm_source=web_app_manifest',
   '/disclaimer/', '/offline/', '/privacy-policy/', 
   '/technical-information/', '/terms-of-service/',
-
   '/images/apple-touch-icon.png',
   '/images/favicon-32x32.png', '/images/favicon-16x16.png',
   '/images/feature-graphic-1024x500.jpg',
@@ -29,8 +28,6 @@ const CACHE_KEY = 'CACHE_KEY';
   '/images/logo-256x256.png', '/images/logo-384x384.png',
   '/images/logo-512x512-maskable.png',
   '/images/logo-512x512.png', '/images/logo.svg',
-
-  // 'https://www.reddit.com/favicon.ico',
  ];
 
 /**
@@ -164,8 +161,19 @@ const fetchAndCache_ = async (request) => {
     console.log('Could not fetch request:', ex);
     const cache = await worker.caches.open(CACHE_KEY);
     if (isJsonpRequest) {
-      response = (await cache.match(JSONP_CACHE_KEY)) || 
-                 (await getEmptyJsonpResponse_(request));
+      response = await cache.match(JSONP_CACHE_KEY)
+      if (response) {
+        // Updating the name of the callback function in the last cached response.
+        const cb = request.url.split('&jsonp=').pop().split('&')[0];
+        const body = (response.body || '').replace(/jsonp_\w+\(/, cb + '(');
+        response = new Response(body, {
+          status: 304,  // response.status,
+          statusText: 'Not Modified',  // response.statusText,
+          headers: response.headers
+        });
+      } else {
+        response = await getEmptyJsonpResponse_(request);
+      }
     } else {
       response = await cache.match('/offline/');
     }
