@@ -148,28 +148,31 @@ const initUpdateFoundListener_ = () => {
  * @return {!Promise}
  * @private
  */
-const fetchAndCache_ = (request) => {
-  let /** !Promise */ result = fetch(request);
+const fetchAndCache_ = async (request) => {
+  // let /** !Promise */ result = fetch(request);
   const isJsonpRequest = isJsonpRequest_(request);
   const JSONP_CACHE_KEY = isJsonpRequest ? getJsonpCacheKey_(request) : '';
 
-  if (isRequiestCacheble_(request) || isJsonpRequest) {
-    result = result.then((response) => worker.caches.open(CACHE_KEY).then((cache) => {
+  let response;
+  try {
+    response = await fetch(request);
+    if (isRequiestCacheble_(request) || isJsonpRequest) {
+      const cache = await worker.caches.open(CACHE_KEY);
       cache.put(JSONP_CACHE_KEY || request, response.clone());
-      return response;
-    }));
+    }
+  } catch(ex) {
+    console.log('Could not fetch request:', ex);
+    const cache = await worker.caches.open(CACHE_KEY);
+    if (isJsonpRequest) {
+      response = (await cache.match(JSONP_CACHE_KEY)) || 
+                 (await getEmptyJsonpResponse_(request));
+    } else {
+      response = await cache.match('/offline/');
+    }
+    console.log('Offline response:', response);
   }
 
-  return result.catch(() => {
-    return worker.caches.open(CACHE_KEY).then((cache) => {
-      if (isJsonpRequest) {
-        return cache.match(JSONP_CACHE_KEY).then((response) => {
-          return response || getEmptyJsonpResponse_(request);
-        });
-      }
-      return cache.match('/offline/');
-    });
-  });
+  return response;
 };
 
 
