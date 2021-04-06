@@ -156,7 +156,7 @@ const fetchAndCache_ = async (request) => {
     if (isRequiestCacheble_(request) || isJsonpRequest) {
       const cache = await worker.caches.open(CACHE_KEY);
       if (JSONP_CACHE_KEY) {
-        const text = await response.text();
+        const text = await response.json();
         const body = (text || '').replace(/jsonp_\w+\(/, 'jsonp_cb(');
         const blob = new Blob([body], {type : 'application/json'});
         console.log(JSONP_CACHE_KEY, text, body, blob);
@@ -177,7 +177,7 @@ const fetchAndCache_ = async (request) => {
       if (response) {
         // Updating the name of the callback function in the last cached response.
         const cb = request.url.split('&jsonp=').pop().split('&')[0];
-        const text = await response.text();
+        const text = await response.json();
         const body = (text || '').replace(/jsonp_cb\(/, cb + '(');
         const blob = new Blob([body], {type : 'application/json'});
         response = new Response(blob, {
