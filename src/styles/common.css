@@ -6,7 +6,12 @@
  */
 
 html, body, td, th, input, button, select, h3 {
-  font-family: arial, sans-serif;
+  /**
+   * Roboto is the default font on Android.
+   * Helvetica Neue is the default font on iOS and macOS.
+   * Arial and sans-serif for others.
+   */
+  font-family: Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 100%;
   margin: 0;
   padding: 0;
