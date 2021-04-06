@@ -155,7 +155,16 @@ const fetchAndCache_ = async (request) => {
     response = await fetch(request);
     if (isRequiestCacheble_(request) || isJsonpRequest) {
       const cache = await worker.caches.open(CACHE_KEY);
-      cache.put(JSONP_CACHE_KEY || request, response.clone());
+      if (JSONP_CACHE_KEY) {
+        const body = (response.body || '').replace(/jsonp_\w+\(/, 'jsonp_cb(');
+        cache.put(JSONP_CACHE_KEY, new Response(body, {
+          status: 304,  // response.status,
+          statusText: 'Not Modified',  // response.statusText,
+          headers: response.headers
+        }));
+      } else {
+        cache.put(request, response.clone());
+      }
     }
   } catch(ex) {
     console.log('Could not fetch request:', ex);
@@ -165,10 +174,10 @@ const fetchAndCache_ = async (request) => {
       if (response) {
         // Updating the name of the callback function in the last cached response.
         const cb = request.url.split('&jsonp=').pop().split('&')[0];
-        const body = (response.body || '').replace(/jsonp_\w+\(/, cb + '(');
+        const body = (response.body || '').replace(/jsonp_cb\(/, cb + '(');
         response = new Response(body, {
-          status: 304,  // response.status,
-          statusText: 'Not Modified',  // response.statusText,
+          status: response.status,
+          statusText: response.statusText,
           headers: response.headers
         });
       } else {
@@ -257,7 +266,7 @@ const getJsonpCacheKey_ = (request) => {
 
   const keys = [map['action'], hash(map['query'])];
   map['source'] && keys.push(map['source']);
-  return 'offline' + keys.join('-') + '.json';
+  return 'offline-' + keys.join('-') + '.json';
 };
 
 
