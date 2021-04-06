@@ -156,15 +156,18 @@ const fetchAndCache_ = async (request) => {
     if (isRequiestCacheble_(request) || isJsonpRequest) {
       const cache = await worker.caches.open(CACHE_KEY);
       if (JSONP_CACHE_KEY) {
-        // const text = await response.text();
-        // const body = (text || '').replace(/jsonp_\w+\(/, 'jsonp_cb(');
-        // const blob = new Blob([body], {type : 'application/json'});
-        // console.log(JSONP_CACHE_KEY, text, body, blob);
-        // cache.put(JSONP_CACHE_KEY, new Response(blob, {
-        //   status: 304,  // response.status,
-        //   statusText: 'Not Modified',  // response.statusText,
-        //   headers: response.headers
-        // }));
+        console.log('response.ok:', response.ok);
+        if (response.ok) {
+          const text = await response.text();
+          const body = (text || '').replace(/jsonp_\w+\(/, 'jsonp_cb(');
+          const blob = new Blob([body], {type : 'application/json'});
+          console.log(JSONP_CACHE_KEY, text, body, blob);
+          cache.put(JSONP_CACHE_KEY, new Response(blob, {
+            status: 304,  // response.status,
+            statusText: 'Not Modified',  // response.statusText,
+            headers: response.headers
+          }));
+        }
       } else {
         cache.put(request, response.clone());
       }
