@@ -158,7 +158,9 @@ const fetchAndCache_ = async (request) => {
       if (JSONP_CACHE_KEY) {
         const text = await response.text();
         const body = (text || '').replace(/jsonp_\w+\(/, 'jsonp_cb(');
-        cache.put(JSONP_CACHE_KEY, new Response(body, {
+        const blob = new Blob([body], {type : 'application/json'});
+        console.log(JSONP_CACHE_KEY, text, body, blob);
+        cache.put(JSONP_CACHE_KEY, new Response(blob, {
           status: 304,  // response.status,
           statusText: 'Not Modified',  // response.statusText,
           headers: response.headers
@@ -177,7 +179,8 @@ const fetchAndCache_ = async (request) => {
         const cb = request.url.split('&jsonp=').pop().split('&')[0];
         const text = await response.text();
         const body = (text || '').replace(/jsonp_cb\(/, cb + '(');
-        response = new Response(body, {
+        const blob = new Blob([body], {type : 'application/json'});
+        response = new Response(blob, {
           status: response.status,
           statusText: response.statusText,
           headers: response.headers
