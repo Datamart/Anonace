@@ -148,11 +148,12 @@ const initUpdateFoundListener_ = () => {
 const fetchAndCache_ = async (request) => {
   // let /** !Promise */ result = fetch(request);
   const isJsonpRequest = isJsonpRequest_(request);
+  const mode = isJsonpRequest ? 'cors' : 'no-cors';
   const JSONP_CACHE_KEY = isJsonpRequest ? getJsonpCacheKey_(request) : '';
 
   let response;
   try {
-    response = await fetch(request);
+    response = await fetch(request, {mode}); 
     if (isRequiestCacheble_(request) || isJsonpRequest) {
       const cache = await worker.caches.open(CACHE_KEY);
       if (JSONP_CACHE_KEY) {
