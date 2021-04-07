@@ -165,12 +165,12 @@ const fetchAndCache_ = async (request) => {
         if (response.ok) {
           const text = await response.text();
           const body = (text || '').replace(/jsonp_\w+\(/, 'jsonp_cb(');
-          const blob = new Blob([body], {type : 'application/json'});
-          console.log(JSONP_CACHE_KEY, text, body, blob);
-          cache.put(JSONP_CACHE_KEY, new Response(blob, {
+          // const blob = new Blob([body], {type : 'text/javascript'});
+          // console.log(JSONP_CACHE_KEY, text, body, blob);
+          cache.put(JSONP_CACHE_KEY, new Response(body, {
             status: 304,  // response.status,
             statusText: 'Not Modified',  // response.statusText,
-            headers: response.headers
+            headers: {'content-type': 'text/javascript'} // response.headers
           }));
         }
       } else {
