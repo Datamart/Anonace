@@ -152,7 +152,7 @@ const fetchAndCache_ = async (request) => {
 
   let response;
   try {
-    response = await fetch(request, {mode: 'cors'});
+    response = await fetch(request);
     if (isRequiestCacheble_(request) || isJsonpRequest) {
       const cache = await worker.caches.open(CACHE_KEY);
       if (JSONP_CACHE_KEY) {
