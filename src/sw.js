@@ -160,15 +160,10 @@ const fetchAndCache_ = async (request) => {
     if (isRequiestCacheble_(request) || isJsonpRequest) {
       const cache = await worker.caches.open(CACHE_KEY);
       if (JSONP_CACHE_KEY) {
-        console.log('request:', request);
-        console.log('response:', response);
         if (response.ok) {
           const clone = response.clone();
           const text = await clone.text();
           const body = (text || '').replace(/jsonp_\w+\(/, 'jsonp_cb(');
-          // const blob = new Blob([body], {type : 'text/javascript'});
-          // console.log(JSONP_CACHE_KEY, text, body, blob);
-          // https://fetch.spec.whatwg.org/#null-body-status
           cache.put(JSONP_CACHE_KEY, new Response(body, {
             status: 200,  // clone.status,
             statusText: 'Ok',  // clone.statusText,
@@ -183,21 +178,21 @@ const fetchAndCache_ = async (request) => {
     console.log('Could not fetch request:', ex);
     const cache = await worker.caches.open(CACHE_KEY);
     if (isJsonpRequest) {
-      // response = await cache.match(JSONP_CACHE_KEY)
-      // if (response) {
-      //   // Updating the name of the callback function in the last cached response.
-      //   const cb = request.url.split('&jsonp=').pop().split('&')[0];
-      //   const text = await response.text();
-      //   const body = (text || '').replace(/jsonp_cb\(/, cb + '(');
-      //   const blob = new Blob([body], {type : 'application/json'});
-      //   response = new Response(blob, {
-      //     status: response.status,
-      //     statusText: response.statusText,
-      //     headers: response.headers
-      //   });
-      // } else {
+      response = await cache.match(JSONP_CACHE_KEY)
+      if (response) {
+        // Updating the name of the callback function in the last cached response.
+        const cb = request.url.split('&jsonp=').pop().split('&')[0];
+        const clone = response.clone();
+        const text = await clone.text();
+        const body = (text || '').replace(/jsonp_cb\(/, cb + '(');
+        response = new Response(body, {
+          status: clone.status,
+          statusText: clone.statusText,
+          headers: clone.headers
+        });
+      } else {
         response = await getEmptyJsonpResponse_(request);
-      //}
+      }
     } else {
       response = await cache.match('/offline/');
     }
