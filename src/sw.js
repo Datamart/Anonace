@@ -168,8 +168,8 @@ const fetchAndCache_ = async (request) => {
           // const blob = new Blob([body], {type : 'text/javascript'});
           // console.log(JSONP_CACHE_KEY, text, body, blob);
           cache.put(JSONP_CACHE_KEY, new Response(body, {
-            status: 304,  // response.status,
-            statusText: 'Not Modified',  // response.statusText,
+            status: 200,  // response.status,
+            statusText: 'Ok',  // response.statusText,
             headers: {'content-type': 'text/javascript'} // response.headers
           }));
         }
