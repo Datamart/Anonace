@@ -156,6 +156,7 @@ const fetchAndCache_ = async (request) => {
     if (isRequiestCacheble_(request) || isJsonpRequest) {
       const cache = await worker.caches.open(CACHE_KEY);
       if (JSONP_CACHE_KEY) {
+        console.log('request:', request);
         console.log('response:', response);
         if (response.ok) {
           const text = await response.text();
