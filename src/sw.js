@@ -163,14 +163,16 @@ const fetchAndCache_ = async (request) => {
         console.log('request:', request);
         console.log('response:', response);
         if (response.ok) {
-          const text = await response.text();
+          const clone = response.clone();
+          const text = await clone.text();
           const body = (text || '').replace(/jsonp_\w+\(/, 'jsonp_cb(');
           // const blob = new Blob([body], {type : 'text/javascript'});
           // console.log(JSONP_CACHE_KEY, text, body, blob);
+          // https://fetch.spec.whatwg.org/#null-body-status
           cache.put(JSONP_CACHE_KEY, new Response(body, {
-            status: 200,  // response.status,
-            statusText: 'Ok',  // response.statusText,
-            headers: {'content-type': 'text/javascript'} // response.headers
+            status: 200,  // clone.status,
+            statusText: 'Ok',  // clone.statusText,
+            headers: {'content-type': 'text/javascript'} // clone.headers
           }));
         }
       } else {
