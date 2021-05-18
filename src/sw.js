@@ -178,7 +178,7 @@ const fetchAndCache_ = async (request) => {
     console.log('Could not fetch request:', ex);
     const cache = await worker.caches.open(CACHE_KEY);
     if (isJsonpRequest) {
-      response = await cache.match(JSONP_CACHE_KEY)
+      response = await cache.match(JSONP_CACHE_KEY);
       if (response) {
         // Updating the name of the callback function in the last cached response.
         const cb = request.url.split('&jsonp=').pop().split('&')[0];

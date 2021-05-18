@@ -1,9 +1,19 @@
 /**
  * @fileoverview Defines <code>reader</code> namespace.
  *
- * @see http://google.github.io/styleguide/javascriptguide.xml
- * @see http://developers.google.com/closure/compiler/docs/js-for-compiler
+ * @see https://google.github.io/styleguide/javascriptguide.xml
+ * @see https://developers.google.com/closure/compiler/docs/js-for-compiler
+ * @see https://github.com/Datamart/Glize
  */
+
+ import {getContext, getDocument} from '../glize/dom/index.js';
+ import {Parser} from './parser.js';
+ import {Api} from './api.js';
+ import {MediaExtractor} from './extractor.js';
+ import {DataStorage} from './storage.js';
+ import {Worker} from './worker.js';
+ import {Twitter} from './twitter.js';
+ import {Reddit} from './reddit.js';
 
 
 /**
@@ -14,19 +24,14 @@ const ENABLE_DEBUG = true;
 
 
 /**
- * Defines <code>reader</code> namespace.
- * @namespace
- */
-const reader = {};
-
-
-
-/**
- * @extends {reader.Parser}
+ * @extends {Parser}
  * @constructor
  */
-reader.App = function() {
-  reader.Parser.call(this);
+const App = function() {
+  Parser.call(this);
+
+  const ctx = getContext();
+  const doc = getDocument();
 
   function drawContent_() {
     var data = {};
@@ -41,11 +46,11 @@ reader.App = function() {
       }
     }
 
-    var keys = util.Object.keys(data);
+    var keys = Object.keys(data);
     var length = keys.length;
     keys.sort();
 
-    var node = dom.getElementById('content');
+    var node = doc.getElementById('content');
     var html = '';
 
     if (length) {
@@ -53,7 +58,7 @@ reader.App = function() {
         html += data[keys[length]].join('');
       }
     } else {
-      html = dom.getElementById('no-result-template').textContent;
+      html = doc.getElementById('no-result-template').textContent;
     }
 
     node.innerHTML = html;
@@ -65,19 +70,19 @@ reader.App = function() {
 
   function initLinkEvents_(node) {
     node.onclick = function(e) {
-      var target = dom.events.getEventTarget(e);
+      var target = e.target;
       if (target) {
         var link = target.getAttribute('data-link');
-        link && dom.context.open(link, '_blank');
+        link && ctx.open(link, '_blank');
       }
     };
   }
 
   function initForm_() {
-    var form = dom.document.forms['interests'];
+    var form = doc.forms['interests'];
     var input = form.elements['q'];
 
-    dom.events.addEventListener(form, dom.events.TYPE.SUBMIT, function() {
+    form.addEventListener('submit', function() {
       interests_.update(input.value.split(','), true);
       input.value = '';
       initInterestsList_();
@@ -88,22 +93,22 @@ reader.App = function() {
   }
 
   function initAutoComplete_(input) {
-    var dataList = dom.createElement('datalist');
-    var webView = ~dom.device.userAgent.indexOf('; wv)');
+    var dataList = doc.createElement('datalist');
+    var webView = ~navigator.userAgent.indexOf('; wv)');
     var supported = 'list' in input && !webView &&
-        Boolean(dataList && dom.context['HTMLDataListElement']);
+        Boolean(dataList && ctx['HTMLDataListElement']);
 
     if (supported) {
-      dom.appendChild(input.parentNode, dataList).id = 'typeahead';
+      input.parentNode.appendChild(dataList).id = 'typeahead';
       input.setAttribute('list', dataList.id);
 
-      dom.events.addEventListener(input, dom.events.TYPE.INPUT, function() {
-        /** @type {string} */ var value = util.String.trim(input.value);
-        dom.clearElement(dataList);
+      input.addEventListener('input', function() {
+        /** @type {string} */ var value = input.value.trim();
+        dataList.options.length = 0;
 
         2 < value.length && api.typeahead(value, 10, function(data) {
           /** @type {number} */ var length = data && data.length;
-          dom.clearElement(dataList);
+          dataList.options.length = 0;
 
           if (length) {
             for (; length--;) {
@@ -111,8 +116,7 @@ reader.App = function() {
               /** @type {string} */ var value = item['screen_name'] ?
                   ('@' + item['screen_name']) : item['hashtag'];
               if (value) {
-                dom.appendChild(
-                    dataList, dom.createElement('OPTION')).value = value;
+                dataList.appendChild(doc.createElement('OPTION')).value = value;
               }
             }
           }
@@ -123,10 +127,10 @@ reader.App = function() {
 
   function initSettingList_(key) {
     var list = settings_[key].get();
-    var keys = util.Object.keys(list);
+    var keys = Object.keys(list);
     var length = keys.length;
     var html = '';
-    var node = dom.getElementById(key + '-list');
+    var node = doc.getElementById(key + '-list');
 
     if (length) {
       keys.sort();
@@ -145,22 +149,22 @@ reader.App = function() {
       initSettingEnableItem_(key, node);
     } else {
       node.innerHTML = html;
-      dom.getElementById('content').innerHTML =
-          dom.getElementById('no-interest-template').textContent;
-      dom.css.addClass(dom.getElementById('sidebar'), 'open');
+      doc.getElementById('content').innerHTML =
+          doc.getElementById('no-interest-template').textContent;
+      doc.getElementById('sidebar').classList.add('open');
     }
   }
 
   function initSettingRemoveItem_(key, node) {
-    var links = dom.getElementsByTagName(node, 'a');
+    var links = node.getElementsByTagName('a');
     var length = links.length;
     var link;
 
     for (; length--;) {
       link = links[length];
-      dom.events.addEventListener(link, dom.events.TYPE.CLICK, function(e) {
+      link.addEventListener('click', function(e) {
         if (confirm('Are you sure you want to remove this ' + key + '?')) {
-          var link = dom.events.getEventTarget(e);
+          var link = e.target;
           var value = link.getAttribute('data-value');
           if (value) {
             settings_[key].remove([value]);
@@ -168,18 +172,18 @@ reader.App = function() {
             initContent_();
           }
         }
-        dom.events.preventDefault(e);
+        e.preventDefault();
       });
     }
   }
 
   function initSettingEnableItem_(key, node) {
-    var inputs = dom.getElementsByTagName(node, 'input');
+    var inputs = node.getElementsByTagName('input');
     var length = inputs.length;
 
     for (; length--;) {
       inputs[length].onclick = function(e) {
-        var input = dom.events.getEventTarget(e);
+        var input = e.target;
         var value = input.value;
         if (value) {
           settings_[key].update([value], input.checked);
@@ -197,8 +201,8 @@ reader.App = function() {
   function initUserConfig_() {
     /** @type {!Object.<string, number>} */ var data = config_.get();
     /** @type {!Object.<string, !Array>} */ var keys = {
-      'interests-count': [dom.events.TYPE.CHANGE, initContent_],
-      'dark-mode': [dom.events.TYPE.CLICK, initDarkMode_]
+      'interests-count': ['change', initContent_],
+      'dark-mode': ['click', initDarkMode_]
     };
 
     function addEventListener(input, item) {
@@ -215,7 +219,7 @@ reader.App = function() {
           }
         }
 
-        dom.events.addEventListener(input, event, function() {
+        input.addEventListener(event, function() {
           value = 'checkbox' == input.type ? +input.checked : input.value;
           data[input.id] = value;
           config_.set(data);
@@ -225,7 +229,7 @@ reader.App = function() {
     }
 
     for (var key in keys) {
-      addEventListener(dom.getElementById(key), keys[key]);
+      addEventListener(doc.getElementById(key), keys[key]);
     }
   }
 
@@ -233,8 +237,8 @@ reader.App = function() {
     /** @type {string} */ var key = 'source';
     /** @type {!Object.<string, number>} */ var list = settings_[key].get();
 
-    if (util.Object.keys(list).length != util.Object.keys(sources_).length) {
-      settings_[key].update(util.Object.keys(sources_), true);
+    if (Object.keys(list).length != Object.keys(sources_).length) {
+      settings_[key].update(Object.keys(sources_), true);
     }
 
     initSettingList_(key);
@@ -245,7 +249,7 @@ reader.App = function() {
     var names = [];
     var hashtags = [];
     var keywords = [];
-    var keys = util.Object.keys(interests);
+    var keys = Object.keys(interests);
     var length = keys.length;
 
     if (length) {
@@ -288,7 +292,7 @@ reader.App = function() {
 
   function load_(query, count) {
     /** @type {string} */ var key = 'source';
-    /** @type {!Object.<string, !reader.Parser>} */ var enabled = {};
+    /** @type {!Object.<string, !Parser>} */ var enabled = {};
     /** @type {!Object.<string, number>} */ var list = settings_[key].get();
 
     for (key in list) {
@@ -297,7 +301,7 @@ reader.App = function() {
       }
     }
 
-    if (util.Object.keys(enabled).length) {
+    if (Object.keys(enabled).length) {
       if (query.length) {
         api.search(enabled, query, count, function(data) {
           for (/** @type {string} */ var source in data) {
@@ -313,8 +317,8 @@ reader.App = function() {
   }
 
   function setStaticContent_(key) {
-    dom.getElementById('content').innerHTML =
-        dom.getElementById(key + '-template').textContent;
+    doc.getElementById('content').innerHTML =
+        doc.getElementById(key + '-template').textContent;
   }
 
   function escape_(str) {
@@ -326,61 +330,57 @@ reader.App = function() {
   }
 
   function initHeaderControls_() {
-    let /** ?Element */ node = dom.getElementById('update-button');
-    node && dom.events.addEventListener(
-        /** @type {!Node} */ (node),
-        dom.events.TYPE.CLICK, function(e) {
-          dom.events.preventDefault(e);
-          api.cacheEnabled = false;
-          initContent_();
-        });
+    let /** ?Element */ node = doc.getElementById('update-button');
+    node && node.addEventListener('click', function(e) {
+      e.preventDefault();
+      api.cacheEnabled = false;
+      initContent_();
+    });
 
     /** @type {!Object.<string, number>} */ var data = config_.get();
-    /** @type {?Element} */ var sidebar = dom.getElementById('sidebar');
+    /** @type {?Element} */ var sidebar = doc.getElementById('sidebar');
 
-    node = dom.getElementById('settings-button');
-    node && dom.events.addEventListener(
-        /** @type {!Node} */ (node),
-        dom.events.TYPE.CLICK, function(e) {
-          dom.events.preventDefault(e);
-          dom.css.toggleClass(sidebar, 'open');
-          data[sidebar.id] = +dom.css.hasClass(sidebar, 'open');
-          config_.set(data);
-        });
+    node = doc.getElementById('settings-button');
+    node && node.addEventListener('click', function(e) {
+      e.preventDefault();
+      sidebar.classList.toggle('open');
+      data[sidebar.id] = +sidebar.classList.contains('open');
+      config_.set(data);
+    });
 
-    dom.css.addClass(sidebar, +data[sidebar.id] ? 'open' : '');
+    +data[sidebar.id] && sidebar.classList.add('open');
   }
 
   const initDarkMode_ = () => {
     const /** !Object<string, number> */ data = config_.get();
 
-    if (!('dark-mode' in data) && dom.context.matchMedia) {
+    if (!('dark-mode' in data) && ctx.matchMedia) {
       const /** string */ query = '(prefers-color-scheme: dark)';
-      data['dark-mode'] = +dom.context.matchMedia(query).matches;
+      data['dark-mode'] = +ctx.matchMedia(query).matches;
       config_.set(data);
     }
 
     if (+data['dark-mode']) {
-      dom.css.addClass(dom.document.body, 'dark');
+      doc.body.classList.add('dark');
     } else {
-      dom.css.removeClass(dom.document.body, 'dark');
+      doc.body.classList.remove('dark');
     }
   };
 
   const initPlatform_ = () => {
-    const /** string */ userAgent = dom.device.userAgent;
+    const /** string */ userAgent = navigator.userAgent;
 
     // iOS pre 13
     const /** boolean */ iOS = /iPad|iPhone|iPod/.test(userAgent) &&
-                               !dom.context['MSStream'];
+                               !ctx['MSStream'];
     // iPad OS 13
-    const /** boolean */ iPadOS = dom.device.platform === 'MacIntel' &&
-                                  dom.device.maxTouchPoints > 1;
+    const /** boolean */ iPadOS = navigator.platform === 'MacIntel' &&
+    navigator.maxTouchPoints > 1;
 
     if (iOS || iPadOS) {
-      dom.css.addClass(dom.document.body, 'ios');
+      doc.body.classList.add('ios');
     } else {
-      dom.css.addClass(dom.document.body, 'md');
+      doc.body.classList.add('md');
     }
   };
 
@@ -389,11 +389,11 @@ reader.App = function() {
   */
   const initNetworkStatus_ = () => {
     const handler = () => {
-      const fn = (dom.device.onLine ? dom.css.removeClass : dom.css.addClass);
-      fn(dom.document.body, 'offline');
+      const cl = doc.body.classList;
+      navigator.onLine ?  cl.remove('offline') : cl.add('offline');
     };
-    dom.events.addEventListener(dom.context, 'online', handler);
-    dom.events.addEventListener(dom.context, 'offline', handler);
+    ctx.addEventListener('online', handler);
+    ctx.addEventListener('offline', handler);
     handler();
   };
 
@@ -407,7 +407,7 @@ reader.App = function() {
     initUserConfig_();
     initContent_();
     initNetworkStatus_();
-    dom.css.removeClass(dom.document.body, 'no-js');
+    doc.body.classList.remove('no-js');
 
     // document.referrer.indexOf('android-app://') == 0 // Android TWA
   };
@@ -415,7 +415,7 @@ reader.App = function() {
   /**
    * The reference to current class instance.
    * Used in private methods and for preventing jslint errors.
-   * @private {!reader.App}
+   * @private {!App}
    */
   const self_ = this;
 
@@ -429,26 +429,26 @@ reader.App = function() {
    */
   let count_ = 0;
 
-  const api = new reader.Api;
-  const interests_ = new reader.DataStorage('interests');
-  const config_ = new reader.DataStorage('config');
-  const extractor_ = new reader.MediaExtractor(api);
-  const worker_ = new reader.Worker;
+  const api = new Api();
+  const interests_ = new DataStorage('interests');
+  const config_ = new DataStorage('config');
+  const extractor_ = new MediaExtractor(api);
+  const worker_ = new Worker();
 
   /**
-   * @private {!Object<string, !reader.DataStorage>}
+   * @private {!Object<string, !DataStorage>}
    */
   const settings_ = {
     'interest': interests_,
-    'source': new reader.DataStorage('sources')
+    'source': new DataStorage('sources')
   };
 
   /**
-   * @private {!Object<string, !reader.Parser>}
+   * @private {!Object<string, !Parser>}
    */
   const sources_ = {
-    'twitter': new reader.Twitter,
-    'reddit': new reader.Reddit
+    'twitter': new Twitter,
+    'reddit': new Reddit
   };
 
   init_();
@@ -456,7 +456,7 @@ reader.App = function() {
 
 
 if (ENABLE_DEBUG) {
-  setTimeout(() => { new reader.App; }, 99);
+  setTimeout(() => { new App; }, 99);
 } else {
-  new reader.App;
+  new App;
 }

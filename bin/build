@@ -162,7 +162,6 @@ function compile_js() {
           --language_out STABLE \
           --externs externs.js \
           --rewrite_polyfills=false \
-          --define 'ENABLE_DEBUG=false' \
           --js_output_file "${JS_COMPILED}"
 
     echo "(function(){" | cat - "${JS_COMPILED}" > "${TMP}/out" && mv "${TMP}/out" "${JS_COMPILED}"

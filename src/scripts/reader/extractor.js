@@ -1,11 +1,15 @@
 
 
+import {getDocument} from '../glize/dom/index.js';
+import {getParameterMap} from '../glize/net/request.js';
+import {Api} from './api.js';
 
 /**
- * @param {!reader.Api} api The instance of Api class.
+ * @param {!Api} api The instance of Api class.
  * @constructor
  */
-reader.MediaExtractor = function(api) {
+export const MediaExtractor = function(api) {
+  const doc = getDocument();
 
   // https://www.youtube.com/watch?v=RVISnYwaB9M
   // https://www.youtube.com/watch?v=RVISnYwaB9M&feature=share
@@ -27,8 +31,8 @@ reader.MediaExtractor = function(api) {
   };
 
   const getYouTubeVideo_ = (url, callback) => {
-    const /** !net.URL */ loc = new net.URL(url);
-    const /** !Object */ map = request_.getParameterMap(loc);
+    const /** !URL */ loc = new URL(url);
+    const /** !Object */ map = getParameterMap(loc);
     let /** string */ videoId = map['v'];
 
     if (!videoId && loc['hostname'] == 'youtu.be') {
@@ -51,12 +55,12 @@ reader.MediaExtractor = function(api) {
     api.proxy(url, (res) => {
       const /** string */ content = (res[0] || '');
       if (content) {
-        let /** ?Element */ element = dom.createElement('div');
+        let /** ?Element */ element = doc.createElement('div');
         element.innerHTML = content.replace(
             TAGS_PATTERN, '<br ').replace(
             /background(-image)\s*\:/img, 'tmp:'); //.substr(0, 2048);
 
-        const nodes = dom.querySelectorAll(element, 'meta');
+        const nodes = element.querySelectorAll('meta');
         for (let i = 0; i < nodes.length; i++) {
           let node = nodes[i];
           let name = node.getAttribute('name') ||
@@ -75,10 +79,8 @@ reader.MediaExtractor = function(api) {
             break;
           }
         }
-        element = dom.NULL;
+        element = null;
       }
     });
   };
-
-  const request_ = new net.ServletRequest;
 };

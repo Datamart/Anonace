@@ -1,10 +1,9 @@
 /**
  * @fileoverview Simple implementation of data storage.
  *
- * @see http://google.github.io/styleguide/javascriptguide.xml
- * @see http://developers.google.com/closure/compiler/docs/js-for-compiler
- *
- * @requires dom.DataStorage
+ * @see https://google.github.io/styleguide/javascriptguide.xml
+ * @see https://developers.google.com/closure/compiler/docs/js-for-compiler
+ * @see https://github.com/Datamart/Glize
  */
 
 
@@ -13,13 +12,13 @@
  * @param {string} key The storage key.
  * @constructor
  */
-reader.DataStorage = function(key) {
+export const DataStorage = function(key) {
 
   /**
    * @return {!Object<string, number>} Return list of saved data items.
    */
   this.get = () => {
-    let data = storage_.get(key) || {};
+    let data = JSON.parse(storage_.getItem(key) || '{}');
 
     if (Array.isArray(data)) {
       // For backward compatibility.
@@ -30,7 +29,7 @@ reader.DataStorage = function(key) {
   };
 
   this.set = (data) => {
-    storage_.set(key, data);
+    storage_.setItem(key, JSON.stringify(data));
   };
 
   /**
@@ -69,12 +68,12 @@ reader.DataStorage = function(key) {
   /**
    * The reference to current class instance.
    * Used in private methods and for preventing jslint errors.
-   * @private {!reader.DataStorage}
+   * @private {!DataStorage}
    */
   const self_ = this;
 
   /**
-   * @private {!dom.DataStorage}
+   * @private {?Storage}
    */
-  const storage_ = new dom.DataStorage;
+  const storage_ = window.localStorage;
 };
