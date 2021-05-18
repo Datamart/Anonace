@@ -1,5 +1,5 @@
 # Anonace [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Anonace%20-%20Read%20your%20favorite%20authors%2C%20influencers%20and%20brands%2C%20follow%20your%20interests%20by%20topics%20and%20hashtags.&url=https://anonace.com/&via=GitHub)
-[![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html) [![Website](https://img.shields.io/website-up-down-green-red/https/anonace.com.svg?style=flat)](https://anonace.com)
+[![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html) [![Website](https://img.shields.io/website-up-down-green-red/https/anonace.com.svg?style=flat)](https://anonace.com) [![build](https://github.com/Datamart/Anonace/actions/workflows/gh-pages.yml/badge.svg)](https://github.com/Datamart/Anonace/actions/workflows/gh-pages.yml)
 
 ![Anonace](https://anonace.com/images/feature-graphic-1024x500.jpg)
 
