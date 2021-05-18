@@ -11,11 +11,6 @@
   "categories": ["news", "social"],
   "icons": [
     {
-      "src": "/images/logo-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
       "src": "/images/logo-144x144.png",
       "sizes": "144x144",
       "type": "image/png"
@@ -50,13 +45,29 @@
   "related_applications": [
     { "platform": "webapp", "url": "https://anonace.com/manifest.json" },
     { "platform": "web", "url": "https://anonace.com/" },
-    { "platform": "play", "url": "https://play.google.com/store/apps/details?id=com.anonace.android", "id": "com.anonace.android" },
-    { "platform": "itunes", "url": "https://itunes.apple.com/app/anonace/id1452074587" }
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.anonace.android",
+      "id": "com.anonace.android"
+    },
+    {
+      "platform": "itunes",
+      "url": "https://itunes.apple.com/app/anonace/id1452074587"
+    }
   ],
   "prefer_related_applications": true,
-  "shortcuts": [{
-    "name": "Technical information",
-    "description": "View application technical information",
-    "url": "/technical-information/"
-  }]
+  "shortcuts": [
+    {
+      "name": "Technical information",
+      "description": "View application technical information",
+      "url": "/technical-information/",
+      "icons": [
+        {
+          "src": "/images/logo-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
 }
