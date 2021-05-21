@@ -1,7 +1,6 @@
 
 
-import {getDocument} from '../glize/dom/index.js';
-import {getParameterMap} from '../glize/net/request.js';
+import * as glize from 'glize';
 import {Api} from './api.js';
 
 /**
@@ -9,7 +8,7 @@ import {Api} from './api.js';
  * @constructor
  */
 export const MediaExtractor = function(api) {
-  const doc = getDocument();
+  const dom = glize.dom;
 
   // https://www.youtube.com/watch?v=RVISnYwaB9M
   // https://www.youtube.com/watch?v=RVISnYwaB9M&feature=share
@@ -32,7 +31,7 @@ export const MediaExtractor = function(api) {
 
   const getYouTubeVideo_ = (url, callback) => {
     const /** !URL */ loc = new URL(url);
-    const /** !Object */ map = getParameterMap(loc);
+    const /** !Object */ map = glize.net.request.getParameterMap(loc);
     let /** string */ videoId = map['v'];
 
     if (!videoId && loc['hostname'] == 'youtu.be') {
@@ -55,12 +54,12 @@ export const MediaExtractor = function(api) {
     api.proxy(url, (res) => {
       const /** string */ content = (res[0] || '');
       if (content) {
-        let /** ?Element */ element = doc.createElement('div');
+        let /** ?Element */ element = dom.makeNode('div');
         element.innerHTML = content.replace(
             TAGS_PATTERN, '<br ').replace(
             /background(-image)\s*\:/img, 'tmp:'); //.substr(0, 2048);
 
-        const nodes = element.querySelectorAll('meta');
+        const nodes = dom.getElementsByTag(element, 'meta');
         for (let i = 0; i < nodes.length; i++) {
           let node = nodes[i];
           let name = node.getAttribute('name') ||

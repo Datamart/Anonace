@@ -6,14 +6,15 @@
  * @see https://github.com/Datamart/Glize
  */
 
- import {getContext, getDocument} from '../glize/dom/index.js';
- import {Parser} from './parser.js';
- import {Api} from './api.js';
- import {MediaExtractor} from './extractor.js';
- import {DataStorage} from './storage.js';
- import {Worker} from './worker.js';
- import {Twitter} from './twitter.js';
- import {Reddit} from './reddit.js';
+import * as glize from 'glize';
+
+import {Parser} from './parser.js';
+import {Api} from './api.js';
+import {MediaExtractor} from './extractor.js';
+import {DataStorage} from './storage.js';
+import {Worker} from './worker.js';
+import {Twitter} from './twitter.js';
+import {Reddit} from './reddit.js';
 
 
 /**
@@ -30,8 +31,9 @@ const ENABLE_DEBUG = true;
 const App = function() {
   Parser.call(this);
 
-  const ctx = getContext();
-  const doc = getDocument();
+  const dom = glize.dom;
+  const ctx = /** @type {!Window} */ (dom.getRootContext());
+  const doc = dom.getDocument();
 
   function drawContent_() {
     var data = {};
@@ -50,7 +52,7 @@ const App = function() {
     var length = keys.length;
     keys.sort();
 
-    var node = doc.getElementById('content');
+    var node = dom.getElement('content');
     var html = '';
 
     if (length) {
@@ -58,7 +60,7 @@ const App = function() {
         html += data[keys[length]].join('');
       }
     } else {
-      html = doc.getElementById('no-result-template').textContent;
+      html = dom.getElement('no-result-template').textContent;
     }
 
     node.innerHTML = html;
@@ -82,7 +84,7 @@ const App = function() {
     var form = doc.forms['interests'];
     var input = form.elements['q'];
 
-    form.addEventListener('submit', function() {
+    dom.addEvent(form, 'submit', function() {
       interests_.update(input.value.split(','), true);
       input.value = '';
       initInterestsList_();
@@ -93,16 +95,16 @@ const App = function() {
   }
 
   function initAutoComplete_(input) {
-    var dataList = doc.createElement('datalist');
+    var dataList = dom.makeNode('datalist');
     var webView = ~navigator.userAgent.indexOf('; wv)');
     var supported = 'list' in input && !webView &&
         Boolean(dataList && ctx['HTMLDataListElement']);
 
     if (supported) {
-      input.parentNode.appendChild(dataList).id = 'typeahead';
+      dom.appendNode(input.parentNode, dataList).id = 'typeahead';
       input.setAttribute('list', dataList.id);
 
-      input.addEventListener('input', function() {
+      dom.addEvent(input, 'input', function() {
         /** @type {string} */ var value = input.value.trim();
         dataList.options.length = 0;
 
@@ -116,7 +118,7 @@ const App = function() {
               /** @type {string} */ var value = item['screen_name'] ?
                   ('@' + item['screen_name']) : item['hashtag'];
               if (value) {
-                dataList.appendChild(doc.createElement('OPTION')).value = value;
+                dom.appendNode(dataList, dom.makeNode('OPTION')).value = value;
               }
             }
           }
@@ -130,7 +132,7 @@ const App = function() {
     var keys = Object.keys(list);
     var length = keys.length;
     var html = '';
-    var node = doc.getElementById(key + '-list');
+    var node = dom.getElement(key + '-list');
 
     if (length) {
       keys.sort();
@@ -149,20 +151,20 @@ const App = function() {
       initSettingEnableItem_(key, node);
     } else {
       node.innerHTML = html;
-      doc.getElementById('content').innerHTML =
-          doc.getElementById('no-interest-template').textContent;
-      doc.getElementById('sidebar').classList.add('open');
+      dom.getElement('content').innerHTML =
+          dom.getElement('no-interest-template').textContent;
+      dom.getElement('sidebar').classList.add('open');
     }
   }
 
   function initSettingRemoveItem_(key, node) {
-    var links = node.getElementsByTagName('a');
+    var links = dom.getElementsByTag(node, 'a');
     var length = links.length;
     var link;
 
     for (; length--;) {
       link = links[length];
-      link.addEventListener('click', function(e) {
+      dom.addEvent(link, 'click', function(e) {
         if (confirm('Are you sure you want to remove this ' + key + '?')) {
           var link = e.target;
           var value = link.getAttribute('data-value');
@@ -178,7 +180,7 @@ const App = function() {
   }
 
   function initSettingEnableItem_(key, node) {
-    var inputs = node.getElementsByTagName('input');
+    var inputs = dom.getElementsByTag(node, 'input');
     var length = inputs.length;
 
     for (; length--;) {
@@ -205,7 +207,7 @@ const App = function() {
       'dark-mode': ['click', initDarkMode_]
     };
 
-    function addEventListener(input, item) {
+    function addEvent(input, item) {
       if (input) {
         var event = item[0];
         var handler = item[1];
@@ -219,7 +221,7 @@ const App = function() {
           }
         }
 
-        input.addEventListener(event, function() {
+        dom.addEvent(input, event, function() {
           value = 'checkbox' == input.type ? +input.checked : input.value;
           data[input.id] = value;
           config_.set(data);
@@ -229,7 +231,7 @@ const App = function() {
     }
 
     for (var key in keys) {
-      addEventListener(doc.getElementById(key), keys[key]);
+      addEvent(dom.getElement(key), keys[key]);
     }
   }
 
@@ -317,8 +319,8 @@ const App = function() {
   }
 
   function setStaticContent_(key) {
-    doc.getElementById('content').innerHTML =
-        doc.getElementById(key + '-template').textContent;
+    dom.getElement('content').innerHTML =
+        dom.getElement(key + '-template').textContent;
   }
 
   function escape_(str) {
@@ -330,18 +332,18 @@ const App = function() {
   }
 
   function initHeaderControls_() {
-    let /** ?Element */ node = doc.getElementById('update-button');
-    node && node.addEventListener('click', function(e) {
+    let /** ?Element */ node = dom.getElement('update-button');
+    node && dom.addEvent(node, 'click', function(e) {
       e.preventDefault();
       api.cacheEnabled = false;
       initContent_();
     });
 
     /** @type {!Object.<string, number>} */ var data = config_.get();
-    /** @type {?Element} */ var sidebar = doc.getElementById('sidebar');
+    /** @type {?Element} */ var sidebar = dom.getElement('sidebar');
 
-    node = doc.getElementById('settings-button');
-    node && node.addEventListener('click', function(e) {
+    node = dom.getElement('settings-button');
+    node && dom.addEvent(node, 'click', function(e) {
       e.preventDefault();
       sidebar.classList.toggle('open');
       data[sidebar.id] = +sidebar.classList.contains('open');
@@ -392,8 +394,8 @@ const App = function() {
       const cl = doc.body.classList;
       navigator.onLine ?  cl.remove('offline') : cl.add('offline');
     };
-    ctx.addEventListener('online', handler);
-    ctx.addEventListener('offline', handler);
+    dom.addEvent(ctx, 'online', handler);
+    dom.addEvent(ctx, 'offline', handler);
     handler();
   };
 

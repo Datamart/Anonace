@@ -6,7 +6,7 @@
  * @see https://github.com/Datamart/Glize
  */
 
-import {getContext, getDocument} from '../glize/dom/index.js';
+import * as glize from 'glize';
 
 
 
@@ -18,8 +18,8 @@ export const Worker = function() {
   const /** string */ SERVICE_WORKER = '/sw.js';
   const /** string */ INSTALL_PWA = 'pwa-install';
 
-  const ctx = getContext();
-  const doc = getDocument();
+  const dom = glize.dom;
+  const ctx = /** @type {!Window} */ (dom.getRootContext());
   const nav = ctx.navigator;
 
   /**
@@ -36,13 +36,13 @@ export const Worker = function() {
    * @private
    */
   const initInstallPrompt_ = () => {
-    ctx.addEventListener('beforeinstallprompt', (event) => {
+    dom.addEvent(ctx, 'beforeinstallprompt', (event) => {
       event.preventDefault();
       installPromptEvent_ = event;
-      initInstallButton_(doc.getElementById(INSTALL_PWA));
+      initInstallButton_(dom.getElement(INSTALL_PWA));
     });
 
-    // ctx.addEventListener('appinstalled', function() {
+    // dom.addEvent(ctx, 'appinstalled', function() {
     //   console.log('onAppInstalled');
     // });
   };
@@ -54,7 +54,7 @@ export const Worker = function() {
   const initInstallButton_ = (element) => {
     if (element) {
       element.classList.add('visible');
-      element.addEventListener('click', () => {
+      dom.addEvent(element, 'click', () => {
         element.classList.remove('visible');
         installPromptEvent_.prompt();
         installPromptEvent_['userChoice'].then((choice) => {

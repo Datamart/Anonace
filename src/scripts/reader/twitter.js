@@ -6,8 +6,9 @@
  * @see https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/tweet-object
  */
 
+import * as glize from 'glize';
+
 import {MediaExtractor} from './extractor.js';
-import {getDocument} from '../glize/dom/index.js';
 import {Parser} from './parser.js';
 
 
@@ -17,8 +18,8 @@ import {Parser} from './parser.js';
  */
 export const Twitter = function() {
   Parser.call(this);
+  const dom = glize.dom;
 
-  const doc = getDocument();
   const /** string */ BASE_URL = 'https://twitter.com/';
   const /** string */ STATUS_URL = 'https://twitter.com/web/status/';
   const /** string */ HASHTAG_URI = 'https://twitter.com/hashtag/';
@@ -98,7 +99,7 @@ export const Twitter = function() {
           html = self_.getYoutubeHtml(media['url']);
         }
 
-        const div = doc.getElementById('media-' + item['id_str']);
+        const div = dom.getElement('media-' + item['id_str']);
         if (div) {
           div.innerHTML = html;
         } else {

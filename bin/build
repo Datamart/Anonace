@@ -25,6 +25,7 @@ readonly CSS_SOURCES="${SRC_PATH}/styles"
 readonly HTML_BUNDLE="${APP_PATH}/bundle.html"
 readonly HTML_SOURCES="${SRC_PATH}/templates"
 readonly PACKAGE_JSON="${CWD}/../package.json"
+readonly NODE_MODULES="${CWD}/../node_modules"
 
 readonly BUILD_DATE="$(date +%Y-%m-%d)"
 readonly APP_VERSION=$(node -pe 'JSON.parse(process.argv[1]).version' "$(cat ${PACKAGE_JSON})")
@@ -147,26 +148,24 @@ function compile_js() {
   if [[ -d "${JS_SOURCES}" ]]; then
     rm -rf "${JS_COMPILED}"
     touch "${JS_COMPILED}" && chmod 0666 "${JS_COMPILED}"
-    echo "var module={exports:{}};" > externs.js
 
-    find "${JS_SOURCES}" -name "*.js" -print \
-      | sed 's/__/AAA/g' | sort \
-      | sed 's/AAA/__/g' \
-      | sed 's/.*/ &/' \
-      | xargs "${JAVA_BIN}" -jar "${JS_COMPILER_JAR}" \
-          --compilation_level ADVANCED \
-          --jscomp_warning=lintChecks \
-          --warning_level VERBOSE \
-          --charset UTF-8 \
-          --use_types_for_optimization \
-          --language_out STABLE \
-          --externs externs.js \
-          --rewrite_polyfills=false \
-          --js_output_file "${JS_COMPILED}"
-
-    echo "(function(){" | cat - "${JS_COMPILED}" > "${TMP}/out" && mv "${TMP}/out" "${JS_COMPILED}"
-    echo '})();' >> "${JS_COMPILED}"
-    rm externs.js
+    "${JAVA_BIN}" -jar "${JS_COMPILER_JAR}" \
+      --js_output_file "${JS_COMPILED}" \
+      --entry_point "${JS_SOURCES}/reader/index.js" \
+      --js "${NODE_MODULES}/**/package.json" \
+      --js "${NODE_MODULES}/**/**.js" \
+      --js "${PACKAGE_JSON}" \
+      --js "${JS_SOURCES}/reader/*.js" \
+      --jscomp_warning lintChecks \
+      --compilation_level ADVANCED \
+      --use_types_for_optimization \
+      --dependency_mode PRUNE \
+      --language_out STABLE \
+      --charset UTF-8 \
+      --process_common_js_modules \
+      --module_resolution NODE \
+      --isolation_mode IIFE \
+      --rewrite_polyfills false
   else
     echo -n "[WARN] Directory '${JS_SOURCES}' doesn't exist. "
   fi

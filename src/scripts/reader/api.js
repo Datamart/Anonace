@@ -6,9 +6,8 @@
  * @see https://en.wikipedia.org/wiki/JSONP
  */
 
- import * as JSONP from '../glize/net/jsonp.js';
- import {Parser} from './parser.js';
-
+import * as glize from 'glize';
+import {Parser} from './parser.js';
 
 
 /**
@@ -88,7 +87,7 @@ export const Api = function() {
     if (content) {
       callback(content);
     } else {
-      JSONP.load(url).then((content) => {
+      glize.net.jsonp.load(url).then((content) => {
         cache_[key] = content;
         callback(content);
       });

@@ -6,9 +6,7 @@
  * @see https://github.com/Datamart/Glize
  */
 
-import {getDocument} from '../glize/dom/index.js';
-import {parseTemplate} from '../glize/dom/template.js';
-import {formatDate} from '../glize/formatters/date.js';
+import * as glize from 'glize';
 import {DataStorage} from './storage.js';
 import {MediaExtractor} from './extractor.js';
 
@@ -17,7 +15,8 @@ import {MediaExtractor} from './extractor.js';
  * @constructor
  */
 export const Parser = function() {
-  const doc = getDocument();
+  const dom = glize.dom;
+  const doc = dom.getDocument();
 
   /**
    * @param {!Array<!Object>} data List of data items.
@@ -40,9 +39,9 @@ export const Parser = function() {
    */
   this.parseTemplate = (key, values) => {
     if (!templates_[key]) {
-      templates_[key] = doc.getElementById(key + '-template').textContent;
+      templates_[key] = dom.getElement(key + '-template').textContent;
     }
-    return parseTemplate(templates_[key], values);
+    return dom.template.parseTemplate(templates_[key], values);
   };
 
   /**
@@ -83,7 +82,7 @@ export const Parser = function() {
   };
 
   this.formatDate = (date) => {
-    return formatDate(date, 'dd MMM, YYYY  hh:mm');
+    return glize.formatters.formatDate(date, 'dd MMM, YYYY  hh:mm');
   };
 
   this.formatHashTags = (text, base) => {

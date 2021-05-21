@@ -10,3 +10,5 @@ src/bundle.css
 www/technical-information/index.html
 www/index.html
 www/sw.js
+node_modules/
+tmp/
