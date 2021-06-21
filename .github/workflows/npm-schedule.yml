@@ -13,6 +13,3 @@ jobs:
           node-version: 15
       - run: npm init --force
       - run: npm install glize
-      - run: |
-          cd node_modules/glize/
-          npm test --if-present
