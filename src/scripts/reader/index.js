@@ -104,7 +104,8 @@ const App = function() {
       dom.appendNode(input.parentNode, dataList).id = 'typeahead';
       input.setAttribute('list', dataList.id);
 
-      dom.addEvent(input, 'input', function() {
+      
+      dom.addEvent(input, 'input', glize.utils.events.debounce(() => {
         /** @type {string} */ var value = input.value.trim();
         dataList.options.length = 0;
 
@@ -123,7 +124,7 @@ const App = function() {
             }
           }
         });
-      });
+      }));
     }
   }
 
@@ -179,22 +180,24 @@ const App = function() {
     }
   }
 
-  function initSettingEnableItem_(key, node) {
-    var inputs = dom.getElementsByTag(node, 'input');
-    var length = inputs.length;
+  const initSettingEnableItem_ = (key, node) => {
+    const inputs = dom.getElementsByTag(node, 'input');
+    let length = inputs.length;
 
     for (; length--;) {
-      inputs[length].onclick = function(e) {
-        var input = e.target;
-        var value = input.value;
-        if (value) {
-          settings_[key].update([value], input.checked);
-          initSettingList_(key);
-          initContent_();
-        }
+      inputs[length].onclick = (e) => {
+        setTimeout(() => { // Do not block custom checkbox rendering.
+          const input = e.target;
+          const value = input.value;
+          if (value) {
+            settings_[key].update([value], input.checked);
+            initSettingList_(key);
+            initContent_();
+          }
+        }, 0);
       };
     }
-  }
+  };
 
   function initInterestsList_() {
     initSettingList_('interest');
