@@ -2,7 +2,7 @@ name: schedule
 
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '*/10 * * * *'
 
 jobs:
   init:
@@ -13,3 +13,4 @@ jobs:
           node-version: 15
       - run: npm init --force
       - run: npm install glize
+      - run: npm install komito-analytics
