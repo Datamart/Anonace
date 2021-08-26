@@ -6,11 +6,10 @@ name: deploy
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 jobs:
   build:
+    if: github.repository == 'Datamart/Anonace'
     runs-on: ubuntu-latest
     steps:
     - name: Checkout 🛎️
