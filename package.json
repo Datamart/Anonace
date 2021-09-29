@@ -20,6 +20,6 @@
     "url": "https://vpodk.com/"
   },
   "dependencies": {
-    "glize": "latest"
+    "glize": "^21.9.15"
   }
 }
