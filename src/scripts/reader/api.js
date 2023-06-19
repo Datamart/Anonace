@@ -16,8 +16,8 @@ import {Parser} from './parser.js';
 export const Api = function() {
 
   const /** string */ API_KEY = atob(
-        'QUtmeWNieXExV3FmdkhEU2ZxZnZkeW5td2UxZnhP' +
-        'MWdEb21IRXE3aHh5LXF3bnpoa19LaTEzaDRodDR5');
+        'QUtmeWNid3I2NHhQREFhdkNnVFhubGc3N3BFaUhsTTdYLUUx'+
+        'TTlWc0JkNkRYelJDWndNUVN0d044V1E0b21iMkhieWxTMWRz');
 
   const /** string */ API_URL = 'https://script.google.com/macros/s/' +
                                 API_KEY + '/exec';
