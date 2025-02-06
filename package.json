@@ -20,6 +20,6 @@
     "url": "https://vpodk.com/"
   },
   "dependencies": {
-    "glize": "^22.7.24"
+    "glize": "^22.7.25"
   }
 }
